@@ -21,7 +21,7 @@ a{
     justify-content: space-between;
 }
 .navbar-back{
-
+    background-color: red;
 }
 .navbar-container{
     width: 1536px;
@@ -138,6 +138,7 @@ a{
 {
     background-color: #f0f9ff;
     margin-bottom: 50px;
+    width: auto;
 }
 .about-container
 {
@@ -402,28 +403,56 @@ p {
     font-size: 18px;
 }
 @media (max-width: 1536px) {
-    .container{
+    .navbar-container{
         width: 1366px;
+    }
+    .hero-container{
+        width: 1366px;
+    }
+    .about-container
+    {
+        /*width: 1366px;*/
     }
     .links{
         gap: 25px;
     }
 }
 @media (max-width: 1366px) {
-    .container{
+    .navbar-container{
+        width: 1280px;
+    }
+    .hero-container{
+        width: 1280px;
+    }
+    .about-container
+    {
         width: 1280px;
     }
 }
 @media (max-width: 1280px) {
-    .container{
+    .navbar-container{
         width: 1024px;
-        padding: 20px;
+        /*padding: 20px;*/
     }
+    .hero-container{
+        width: 1024px;
+        /*padding: 20px;*/
+    }
+    .about-container
+    {
+        width: 1024px;
+
+    }
+
 }
 @media (max-width: 1024px) {
-    .container{
+    .navbar-container{
         width: 768px;
     }
+    .hero-container{
+        width: 768px;
+    }
+
     .links{
         gap: 15px;
         font-size: 20px;
@@ -442,7 +471,10 @@ p {
     }
 }
 @media (max-width: 768px) {
-    .container{
+    .navbar-container{
+        width: 640px;
+    }
+    .hero-container{
         width: 640px;
     }
     .links{
@@ -495,7 +527,10 @@ p {
     }
 }
 @media (max-width: 640px) {
-    .container{
+    .navbar-container{
+        width: auto;
+    }
+    .hero-container{
         width: auto;
     }
 }
