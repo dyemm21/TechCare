@@ -2,7 +2,7 @@
     <link rel="stylesheet" href="../../../style.css">
 
     <?php
-    include './components/navbar/navbar.php';
+    include './src/components/navbar/navbar.php';
     ?>
 
     <div class="contact-container">
@@ -10,6 +10,6 @@
     </div>
 
     <?php
-    include './components/footer/footer.php';
+    include './src/components/footer/footer.php';
     ?>
 </div>

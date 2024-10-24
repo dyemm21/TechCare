@@ -6,19 +6,19 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'home';
 // Obsługa routingu dla podstron
 switch ($page) {
     case 'about':
-        include './about/index.php';
+        include './src/app/about/index.php';
         break;
     case 'services':
-        include './services/index.php';
+        include './src/app/services/index.php';
         break;
     case 'contact':
-        include './contact/index.php';
+        include './src/app/contact/index.php';
         break;
     case 'settings':
-        include './settings/index.php';
+        include './src/app/settings/index.php';
         break;
     case 'login':
-        include './login/index.php';
+        include './src/app/login/index.php';
         break;
     default:
         include './src/app/home/index.php'; // domyślna strona główna
