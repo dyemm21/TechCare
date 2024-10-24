@@ -1,0 +1,133 @@
+.features-back{
+
+}
+.features-container{
+    width: 1536px;
+    padding: 50px 50px 10px 50px;
+    margin: auto;
+}
+.features {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 100px;
+    /*height: 50vh;*/
+}
+
+.feature {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    /*height: 340px;*/
+    padding: 30px;
+    width: 23%;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+.feature:hover {
+    transform: translateY(-10px);
+}
+.icon img {
+    width: 60px;
+    margin-bottom: 20px;
+}
+
+.feature h3 {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.feature p {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+}
+.feature:hover h3 {
+    color: #0056d2;
+}
+.feature:hover{
+    background: rgb(0,0,0,0.01);
+}
+
+@media (max-width: 1536px) {
+    .features-container{
+        width: 1366px;
+    }
+    .feature {
+        padding: 20px;
+    }
+
+}
+@media (max-width: 1366px) {
+    .features-container{
+        width: 1280px;
+    }
+
+}
+@media (max-width: 1280px) {
+    .features-container{
+        width: 1024px;
+        padding: 50px 20px 10px 20px;
+    }
+    .feature {
+        padding: 20px;
+        height: 300px;
+    }
+
+
+}
+@media (max-width: 1024px) {
+    .features-container{
+        width: 768px;
+    }
+    .feature {
+        padding: 15px;
+        height: 320px;
+    }
+    .feature h3 {
+        height: 55px;
+    }
+
+}
+@media (max-width: 768px) {
+    .features-container{
+        width: 640px;
+    }
+    .features{
+        flex-direction: column;
+        gap: 40px;
+        align-items: center;
+    }
+    .feature {
+        height: auto;
+        width: 100%;
+    }
+    .feature h3 {
+        height: auto;
+    }
+    .feature h3 {
+        font-size: 24px;
+    }
+    .feature p {
+        font-size: 16px;
+    }
+    .icon img {
+        width: 80px;
+        margin-bottom: 0;
+    }
+
+}
+@media (max-width: 640px) {
+    .features-container{
+        width: auto;
+    }
+    .feature h3 {
+        font-size: 22px;
+    }
+    .feature p {
+        font-size: 14px;
+    }
+
+}

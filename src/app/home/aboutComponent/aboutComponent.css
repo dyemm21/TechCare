@@ -1,0 +1,150 @@
+.about-back
+{
+    background-color: #f0f9ff;
+    margin-bottom: 50px;
+    border-radius: 20px;
+}
+.about-container
+{
+    width: 1536px;
+    padding: 50px 50px 70px 50px;
+    margin: auto;
+}
+.about{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.about h2{
+    font-size: 54px;
+    font-weight: 600;
+}
+.about-description {
+    color: #666;
+    font-size: 18px;
+    /*margin-bottom: 50px;*/
+}
+.about-post{
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    background-color: white;
+    border-radius: 10px;
+    border: none;
+    padding: 20px;
+    width: 80%;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+.about-post:hover{
+    transform: translateX(10px);
+}
+.about-image{
+    width: 60px;
+}
+.about-details h3{
+    font-size: 26px;
+    font-weight: 600;
+    color: #222;
+}
+.about-details p{
+    font-size: 16px;
+    color: #333;
+}
+
+@media (max-width: 1536px) {
+    .about-container
+    {
+        width: 1366px;
+    }
+    .about-post{
+        width: 95%;
+    }
+
+}
+@media (max-width: 1366px) {
+    .about-container
+    {
+        width: 1280px;
+    }
+
+}
+@media (max-width: 1280px) {
+    .about-container
+    {
+        width: 1024px;
+        padding: 50px 20px 70px 20px;
+    }
+
+}
+@media (max-width: 1024px) {
+    .about-container
+    {
+        width: 768px;
+    }
+    .about-details p{
+        font-size: 16px;
+    }
+
+}
+@media (max-width: 768px) {
+    .about-container
+    {
+        width: 640px;
+    }
+    .about h2{
+        font-size: 38px;
+        color: #222;
+    }
+    .about-back
+    {
+        margin-bottom: 20px;
+    }
+
+}
+@media (max-width: 640px) {
+    .about-container
+    {
+        width: auto;
+    }
+    .about-container
+    {
+        padding: 35px 20px 60px 20px;
+    }
+    .about{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .about h2{
+        text-align: center;
+    }
+    .about-description {
+        color: #666;
+        font-size: 16px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    .about-image{
+        width: 60px;
+    }
+    .about-post{
+        gap: 20px;
+        padding: 15px;
+    }
+    .about-image{
+        display: none;
+    }
+    .about-details h3{
+        font-size: 22px;
+    }
+    .about-details p{
+        font-size: 14px;
+    }
+    .about-back
+    {
+        border-radius: 15px;
+    }
+
+}
