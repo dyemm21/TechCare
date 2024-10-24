@@ -21,7 +21,7 @@ a{
     justify-content: space-between;
 }
 .navbar-back{
-    background-color: red;
+    /*background-color: red;*/
 }
 .navbar-container{
     width: 1536px;
@@ -138,7 +138,7 @@ a{
 {
     background-color: #f0f9ff;
     margin-bottom: 50px;
-    width: auto;
+    border-radius: 15px;
 }
 .about-container
 {
@@ -154,7 +154,6 @@ a{
 .about h2{
     font-size: 54px;
     font-weight: 600;
-    color: #222;
 }
 .about-description {
     color: #666;
@@ -169,7 +168,7 @@ a{
     border-radius: 10px;
     border: none;
     padding: 20px;
-    width: 70%;
+    width: 80%;
     margin-bottom: 10px;
     cursor: pointer;
     transition: transform 0.3s ease;
@@ -183,9 +182,11 @@ a{
 .about-details h3{
     font-size: 26px;
     font-weight: 600;
+    color: #222;
 }
 .about-details p{
-    font-size: 18px;
+    font-size: 16px;
+    color: #333;
 }
 .features-back{
 
@@ -200,8 +201,6 @@ a{
     justify-content: space-between;
     align-items: center;
     margin-bottom: 100px;
-    padding: 10px;
-    /*background-color: #f0f9ff;*/
     /*height: 50vh;*/
 }
 
@@ -224,13 +223,13 @@ a{
     margin-bottom: 20px;
 }
 
-h3 {
+.feature h3 {
     font-size: 20px;
     color: #333;
     margin-bottom: 15px;
 }
 
-p {
+.feature p {
     font-size: 14px;
     color: #666;
     line-height: 1.6;
@@ -250,12 +249,11 @@ p {
 .services {
     text-align: center;
 }
-
 .services h2 {
     font-size: 54px;
     font-weight: 600;
     margin-bottom: 12px;
-    color: #222;
+    /*color: #222;*/
 }
 
 .services-description {
@@ -271,12 +269,10 @@ p {
     justify-content: space-between;
     align-items: center;
 }
-
 .service-card {
-    background-color: #fff;
+    background-color: white;
     border-radius: 5px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
     align-items: center;
     padding-bottom: 30px;
     width: 32%;
@@ -294,7 +290,7 @@ p {
     height: 200px;
     object-fit: cover;
     border-radius: 6px;
-    margin-bottom: 1rem;
+    margin-bottom: 20px;
 }
 
 .service-icon {
@@ -308,7 +304,7 @@ p {
     position: absolute;
     z-index: 1;
     right: 43%;
-    top: 39%;
+    top: 38%;
 }
 
 .service-icon img {
@@ -324,6 +320,7 @@ p {
 }
 
 .service-description {
+    font-size: 16px;
     color: #666;
     display: inline-flex;
     width: 90%;
@@ -346,55 +343,57 @@ p {
 }
 .footer-container{
     width: 1536px;
-    padding: 0 50px;
     margin: auto;
 }
-
 .footer{
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    padding: 0 70px;
+    /*gap: 40px;*/
+    margin-bottom: 10px;
     color: #666666;
+}
+
+.footer-details{
+    display: flex;
+    /*gap: 190px;*/
+
 }
 .footer-section{
     display: flex;
     flex-direction: column;
     gap: 15px;
-    width: 23%;
+    width: calc(100vw / 4);
     font-size: 18px;
     cursor: pointer;
+    margin-bottom: 10px;
 }
-.footer-details{
-    display: flex;
-    justify-content: space-between;
-    /*gap: 100px;*/
 
-}
 .footer-section:nth-child(1) h3{
     color: #0056d2;
     font-size: 26px;
-    margin-bottom: 10px;
 }
 .footer-section:nth-child(2) h3
 {
     color: black;
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 600;
-    margin-bottom: 10px;
 }
 .footer-section:nth-child(3) h3
 {
     color: black;
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 600;
-    margin-bottom: 10px;
 }
 .footer-section:nth-child(4) h3
 {
     color: black;
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 600;
     margin-bottom: 10px;
+}
+.footer-section p{
+    font-size: 16px;
 }
 .footer-sign{
     display: flex;
@@ -411,10 +410,29 @@ p {
     }
     .about-container
     {
-        /*width: 1366px;*/
+        width: 1366px;
+    }
+    .about-post{
+        width: 95%;
+    }
+    .features-container{
+        width: 1366px;
+    }
+    .services-container{
+        width: 1366px;
+    }
+    .footer-container{
+        width: 1366px;
     }
     .links{
         gap: 25px;
+    }
+    .feature {
+        padding: 20px;
+    }
+    .service-icon {
+        right: 42%;
+        top: 38%;
     }
 }
 @media (max-width: 1366px) {
@@ -428,20 +446,61 @@ p {
     {
         width: 1280px;
     }
+    .features-container{
+        width: 1280px;
+    }
+    .services-container{
+        width: 1280px;
+    }
+    .footer-container{
+        width: 1280px;
+    }
+    .service-icon {
+        top: 36%;
+    }
+
 }
 @media (max-width: 1280px) {
     .navbar-container{
         width: 1024px;
-        /*padding: 20px;*/
+        padding: 0 20px;
     }
     .hero-container{
         width: 1024px;
-        /*padding: 20px;*/
+        padding: 0 20px;
     }
     .about-container
     {
         width: 1024px;
-
+        padding: 50px 20px 70px 20px;
+    }
+    .features-container{
+        width: 1024px;
+        padding: 50px 20px 10px 20px;
+    }
+    .services-container{
+        width: 1024px;
+        padding: 40px 20px 90px 20px;
+    }
+    .footer-container{
+        width: 1024px;
+    }
+    .footer{
+        padding: 0 30px;
+    }
+    .feature {
+        padding: 20px;
+        height: 300px;
+    }
+    .service-icon {
+        right: 40%;
+        top: 36%;
+    }
+    .footer-details{
+        justify-content: space-between;
+    }
+    .footer-section{
+        width: auto;
     }
 
 }
@@ -452,7 +511,25 @@ p {
     .hero-container{
         width: 768px;
     }
-
+    .about-container
+    {
+        width: 768px;
+    }
+    .features-container{
+        width: 768px;
+    }
+    .services-container{
+        width: 768px;
+    }
+    .footer-container{
+        width: 768px;
+    }
+    .footer{
+        padding: 0 20px;
+    }
+    .about-details p{
+        font-size: 16px;
+    }
     .links{
         gap: 15px;
         font-size: 20px;
@@ -466,9 +543,21 @@ p {
         padding:10px 12px;
         font-size: 20px;
     }
+    .feature {
+        padding: 15px;
+        height: 320px;
+    }
+    .feature h3 {
+        height: 55px;
+    }
     .service-title {
         font-size: 20px;
     }
+    .service-icon {
+        right: 35%;
+        top: 35%;
+    }
+
 }
 @media (max-width: 768px) {
     .navbar-container{
@@ -477,12 +566,36 @@ p {
     .hero-container{
         width: 640px;
     }
+    .about-container
+    {
+        width: 640px;
+    }
+    .features-container{
+        width: 640px;
+    }
+    .services-container{
+        width: 640px;
+    }
+    .footer-container{
+        width: 640px;
+    }
+    .footer{
+        padding: 0 40px;
+    }
+    .about h2{
+        font-size: 38px;
+        color: #222;
+    }
+    .about-back
+    {
+        margin-bottom: 20px;
+    }
     .links{
         display: none;
     }
     .mobile-links{
         position: fixed;
-        top: 90px;
+        top: 0;
         right: 0;
         width: 50%;
         height: 100vh;
@@ -491,7 +604,7 @@ p {
         display: flex;
         flex-direction: column;
         align-items: center;
-        z-index: 1;
+        z-index: 2;
         justify-content: center;
         gap: 15px;
     }
@@ -512,6 +625,9 @@ p {
         background-color: inherit;
         border: none;
         cursor: pointer;
+        position: fixed;
+        right: 20px;
+        z-index: 3;
     }
     .button{
         min-width: 100px;
@@ -525,6 +641,90 @@ p {
         border: none;
         border-radius: 5px;
     }
+    .hero-content h1 {
+        font-size: 42px;
+    }
+    .hero-content p {
+        font-size: 16px;
+    }
+    .hero-buttons {
+        display: flex;
+        gap: 15px;
+    }
+    .btn-primary {
+        padding: 10px 35px;
+        font-size: 14px;
+    }
+    .btn-secondary {
+        padding: 10px 30px;
+        font-size: 14px;
+    }
+    .features{
+        flex-direction: column;
+        gap: 40px;
+        align-items: center;
+    }
+    .feature {
+        height: auto;
+        width: 100%;
+    }
+    .feature h3 {
+        height: auto;
+    }
+    .icon img {
+        width: 80px;
+        margin-bottom: 0;
+    }
+    .feature h3 {
+        font-size: 24px;
+    }
+    .feature p {
+        font-size: 16px;
+    }
+    .service-title {
+        font-size: 20px;
+    }
+    .services h2 {
+        font-size: 42px;
+    }
+    .services-grid {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 40px;
+    }
+    .service-card {
+        width: 100%;
+    }
+    .service-icon {
+        width: 75px;
+        height: 75px;
+        right: 43%;
+        top: 38%;
+    }
+    .service-title {
+        font-size: 26px;
+        margin: 20px 0;
+        color: #222;
+    }
+
+    .service-description {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+    .footer-section{
+        gap: 15px;
+        width: 45%;
+    }
+    .footer-details{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        /*gap: 190px;*/
+
+    }
+
 }
 @media (max-width: 640px) {
     .navbar-container{
@@ -533,4 +733,99 @@ p {
     .hero-container{
         width: auto;
     }
+    .about-container
+    {
+        width: auto;
+    }
+    .features-container{
+        width: auto;
+    }
+    .services-container{
+        width: auto;
+    }
+    .footer-container{
+        width: auto;
+    }
+    .hero-section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        /*padding: 100px 0;*/
+        /*height: auto;*/
+        /*height: calc(100vh - 60px);*/
+    }
+    .hero-image{
+        display: none;
+    }
+    .hero-content {
+        max-width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .hero-content h1 {
+        text-align: center;
+        width: 80%;
+    }
+    .hero-content p {
+        width: 80%;
+        text-align: center;
+    }
+    .about-container
+    {
+        padding: 35px 20px 60px 20px;
+    }
+    .about{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .about h2{
+        text-align: center;
+    }
+    .about-description {
+        color: #666;
+        font-size: 16px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    .about-image{
+        width: 60px;
+    }
+    .about-post{
+        gap: 20px;
+        padding: 15px;
+    }
+    .about-image{
+        display: none;
+    }
+    .about-details h3{
+        font-size: 22px;
+    }
+    .about-details p{
+        font-size: 14px;
+    }
+    .about-back
+    {
+        border-radius: 15px;
+    }
+    .feature h3 {
+        font-size: 22px;
+    }
+    .feature p {
+        font-size: 14px;
+    }
+    .services-description {
+        width: 90%;
+    }
+    .service-icon {
+        width: 70px;
+        height: 70px;
+        right: 40%;
+        top: 35%;
+    }
+    .service-description {
+        height: 80px;
+    }
+
 }
