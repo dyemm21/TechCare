@@ -3,13 +3,9 @@
 
     <?php
     include './src/components/navbar/navbar.php';
-    ?>
+    include './src/app/about/firstComponent/firstComponent.php';
+    include './src/app/about/secondComponent/secondComponent.php';
 
-    <div class="about-container">
-        About
-    </div>
-
-    <?php
     include './src/components/footer/footer.php';
     ?>
 </div>

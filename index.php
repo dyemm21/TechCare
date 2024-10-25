@@ -1,9 +1,7 @@
 
 <?php
-// Pobranie ścieżki strony z URL, np. ?page=about
-$page = isset($_GET['page']) ? $_GET['page'] : 'home';
+$page = $_GET['page'] ?? 'home';
 
-// Obsługa routingu dla podstron
 switch ($page) {
     case 'about':
         include './src/app/about/index.php';
@@ -21,7 +19,7 @@ switch ($page) {
         include './src/app/login/index.php';
         break;
     default:
-        include './src/app/home/index.php'; // domyślna strona główna
+        include './src/app/home/index.php';
         break;
 }
 ?>

@@ -1,0 +1,126 @@
+.page-about-first-back
+{
+
+}
+
+.page-about-first-container{
+    width: 1536px;
+    padding: 0 50px;
+    margin: auto;
+}
+.page-about{
+    display: flex;
+    flex-direction: column;
+    /*gap: 70px;*/
+}
+.page-about-head {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: calc(100vh - 60px);
+}
+.page-about h1{
+    font-size: 52px;
+    letter-spacing: 1px;
+}
+.page-about p{
+    font-size: 20px;
+    color: #555;
+    width: 700px;
+    margin-bottom: 10px;
+}
+.page-about-buttons{
+    display: flex;
+    gap: 50px;
+}
+.page-about-buttons button{
+    padding: 15px 20px;
+    background-color: #084bcf;
+    color: white;
+    border-radius: 5px;
+    font-size: 20px;
+    font-weight: 500;
+    cursor: pointer;
+}
+.page-about-buttons button:nth-child(1)
+{
+    border: none;
+    transition: background-color 0.3s ease;
+}
+.page-about-buttons button:hover:nth-child(1)
+{
+    background-color: #0338a3;
+}
+.page-about-buttons button:nth-child(2)
+{
+    background-color: white;
+    color: #084bcf;
+    border: 2px solid #084bcf;
+    transition: background-color 0.3s ease;
+}
+.page-about-buttons button:hover:nth-child(2)
+{
+    background-color: #0338a3;
+    color: white;
+}
+@media(max-width: 1536px)
+{
+    .page-about-first-container{
+        width: 1366px;
+    }
+}
+@media(max-width: 1366px)
+{
+    .page-about-first-container{
+        width: 1280px;
+    }
+}@media(max-width: 1280px)
+{
+    .page-about-first-container{
+        width: 1024px;
+        padding: 0 20px;
+    }
+}@media(max-width: 1024px)
+{
+    .page-about-first-container{
+        width: 768px;
+    }
+    .page-about h1{
+        font-size: 42px;
+        letter-spacing: 0;
+    }
+    .page-about p{
+        font-size: 20px;
+        width: 700px;
+    }
+}@media(max-width: 768px)
+{
+    .page-about-first-container{
+        width: 640px;
+    }
+    .page-about p{
+        width: auto;
+    }
+    .page-about-buttons{
+        gap: 30px;
+    }
+}
+@media(max-width: 640px)
+{
+    .page-about-first-container{
+        width: auto;
+    }
+    .page-about-buttons button{
+        padding: 15px 15px;
+        font-size: 14px;
+    }
+    .page-about h1{
+        font-size: 38px;
+    }
+    .page-about p{
+        font-size: 18px;
+    }
+}

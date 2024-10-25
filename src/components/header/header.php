@@ -11,7 +11,9 @@
     <link rel="stylesheet" href="/src/app/home/aboutComponent/aboutComponent.css">
     <link rel="stylesheet" href="/src/app/home/featuresComponent/featuresComponent.css">
     <link rel="stylesheet" href="/src/app/home/servicesComponent/servicesComponent.css">
-<!--    <link rel="stylesheet" href="/about/style.css">-->
+    <link rel="stylesheet" href="/src/app/about/firstComponent/firstComponent.css">
+    <link rel="stylesheet" href="/src/app/about/secondComponent/secondComponent.css">
+
 <!--    <link rel="stylesheet" href="/contact/style.css">-->
 <!--    <link rel="stylesheet" href="/login/style.css">-->
 <!--    <link rel="stylesheet" href="/register/style.css">-->
