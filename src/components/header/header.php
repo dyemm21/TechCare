@@ -13,6 +13,14 @@
     <link rel="stylesheet" href="/src/app/home/servicesComponent/servicesComponent.css">
     <link rel="stylesheet" href="/src/app/about/firstComponent/firstComponent.css">
     <link rel="stylesheet" href="/src/app/about/secondComponent/secondComponent.css">
+    <link rel="stylesheet" href="/src/app/about/thirdComponent/thirdComponent.css">
+    <link rel="stylesheet" href="/src/app/about/fourthComponent/fourthComponent.css">
+    <link rel="stylesheet" href="/src/app/services/firstComponent/firstComponent.css">
+    <link rel="stylesheet" href="/src/app/services/secondComponent/secondComponent.css">
+    <link rel="stylesheet" href="/src/app/contact/firstComponent/firstComponent.css">
+    <link rel="stylesheet" href="/src/app/contact/secondComponent/secondComponent.css">
+    <link rel="stylesheet" href="/src/app/login/LoginComponent/LoginComponent.css">
+    <link rel="stylesheet" href="/src/app/register/RegisterComponent/RegisterComponent.css">
 
 <!--    <link rel="stylesheet" href="/contact/style.css">-->
 <!--    <link rel="stylesheet" href="/login/style.css">-->

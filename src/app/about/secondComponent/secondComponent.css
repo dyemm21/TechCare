@@ -132,6 +132,10 @@
     .page-about-main-content p {
         font-size: 18px;
     }
+    .page-about-second-back
+    {
+        border-radius: 10px;
+    }
 
 }
 @media(max-width: 640px)

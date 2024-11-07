@@ -18,6 +18,9 @@ switch ($page) {
     case 'login':
         include './src/app/login/index.php';
         break;
+    case 'register':
+        include './src/app/register/index.php';
+        break;
     default:
         include './src/app/home/index.php';
         break;

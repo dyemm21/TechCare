@@ -154,6 +154,9 @@
     .services h2 {
         font-size: 42px;
     }
+    .services-back{
+        border-radius: 10px;
+    }
     .services-grid {
         display: flex;
         justify-content: center;

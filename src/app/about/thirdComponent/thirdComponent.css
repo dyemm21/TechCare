@@ -1,0 +1,195 @@
+.page-about-third-back{
+    margin: 80px 0 180px 0;
+}
+.page-about-third-container{
+    width: 1536px;
+    padding: 0 50px;
+    margin: auto;
+}
+.page-about-third{
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+}
+.page-about-third-head {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+.page-about-third-head h2{
+    font-size: 42px;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+.page-about-third-head p{
+    font-size: 16px;
+    color: #666;
+    width: 700px;
+    margin-bottom: 10px;
+}
+.page-about-third-grid {
+    display: flex;
+    justify-content: space-between;
+}
+.page-about-third-card {
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 30px;
+    width: 32%;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.page-about-third-card:hover {
+    transform: translateY(-5px);
+}
+.page-about-third-quote{
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    margin-left: 30px;
+    margin-top: 40px;
+}
+
+.page-about-third-description {
+    font-size: 16px;
+    color: #666;
+    display: inline-flex;
+    padding: 0 30px;
+    height: 75px;
+}
+.page-about-third-user
+{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 0 30px;
+}
+.page-about-third-icon{
+    height: 60px;
+    width: 60px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+.page-about-third-user-info{
+    display: flex;
+    flex-direction: column;
+}
+.page-about-third-men
+{
+    font-weight: 600;
+    color: #222;
+    font-size: 20px;
+}
+.page-about-third-device{
+    font-weight: 500;
+    color: #555;
+    font-size: 14px;
+}
+@media (max-width: 1536px) {
+    .page-about-third-container{
+        width: 1366px;
+    }
+    .page-about-third-description {
+        padding-left: 30px;
+        padding-right: 30px;
+        height: 90px;
+    }
+
+
+}
+@media (max-width: 1366px) {
+    .page-about-third-container{
+        width: 1280px;
+    }
+    .page-about-third-description {
+        padding-left: 30px;
+        padding-right: 20px;
+        height: 95px;
+    }
+
+
+
+}
+@media (max-width: 1280px) {
+    .page-about-third-container{
+        width: 1024px;
+        padding: 40px 20px 90px 20px;
+    }
+    .page-about-third-description {
+        padding-left: 30px;
+        padding-right: 20px;
+        height: 115px;
+    }
+
+
+}
+@media (max-width: 1024px) {
+    .page-about-third-container{
+        width: 768px;
+    }
+    .page-about-third-description {
+        padding-left: 20px;
+        padding-right: 10px;
+        height: 165px;
+    }
+    .page-about-third-quote{
+        width: 30px;
+        height: 30px;
+        margin-left: 20px;
+        margin-top: 30px;
+    }
+    .page-about-third-user
+    {
+        gap: 20px;
+        padding: 0 20px;
+    }
+}
+@media (max-width: 768px) {
+    .page-about-third-container{
+        width: 640px;
+    }
+    .page-about-third-back{
+        margin: 0;
+        margin-bottom: 20px;
+    }
+    .page-about-third-head h2 {
+        font-size: 36px;
+    }
+    .page-about-third-head p{
+        padding: 0 50px;
+    }
+    .page-about-third-grid {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 50px;
+    }
+    .page-about-third-card {
+        width: 100%;
+    }
+    .page-about-third-description {
+        padding-left: 20px;
+        padding-right: 10px;
+        height: auto;
+    }
+
+}
+@media (max-width: 640px) {
+    .page-about-third-container{
+        width: auto;
+    }
+    .page-about-third-head p{
+        width: auto;
+        padding: 0;
+    }
+}

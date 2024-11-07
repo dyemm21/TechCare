@@ -100,6 +100,7 @@
     .about-back
     {
         margin-bottom: 20px;
+        border-radius: 10px;
     }
 
 }
@@ -142,9 +143,4 @@
     .about-details p{
         font-size: 14px;
     }
-    .about-back
-    {
-        border-radius: 15px;
-    }
-
 }

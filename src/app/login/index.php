@@ -3,13 +3,7 @@
 
     <?php
     include './src/components/navbar/navbar.php';
-    ?>
-
-    <div class="login-container">
-        Login
-    </div>
-
-    <?php
+    include './src/app/login/LoginComponent/LoginComponent.php';
     include './src/components/footer/footer.php';
     ?>
 </div>

@@ -6,7 +6,7 @@
     ?>
 
     <div class="settings-container">
-        Settings
+<!--        Settings-->
     </div>
 
     <?php

@@ -3,13 +3,7 @@
 
     <?php
     include './src/components/navbar/navbar.php';
-    ?>
-
-    <div class="register-container">
-        Register
-    </div>
-
-    <?php
+    include './src/app/register/RegisterComponent/RegisterComponent.php';
     include './src/components/footer/footer.php';
     ?>
 </div>
