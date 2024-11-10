@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="/src/app/contact/secondComponent/secondComponent.css">
     <link rel="stylesheet" href="/src/app/login/LoginComponent/LoginComponent.css">
     <link rel="stylesheet" href="/src/app/register/RegisterComponent/RegisterComponent.css">
+    <link rel="stylesheet" href="/src/app/settings/SettingsComponent/SettingsComponent.css">
 
 <!--    <link rel="stylesheet" href="/contact/style.css">-->
 <!--    <link rel="stylesheet" href="/login/style.css">-->

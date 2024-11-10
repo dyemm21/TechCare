@@ -1,0 +1,137 @@
+.settings-first-back{
+
+}
+.settings-first-container{
+    width: 1536px;
+    padding: 0 50px;
+    margin: auto;
+}
+.settings-first-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: calc(100vh - 60px);
+}
+.services-first-head
+{
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+.services-first-head h3{
+    font-size: 32px;
+    font-weight: 500;
+}
+.settings-first-sections
+{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    width: 1366px;
+    background-color: #f4f4f4;
+    padding:8px 8px;
+    color: #888888;
+    border-radius: 30px;
+}
+.settings-first-section
+{
+    padding: 12px 40px;
+    border-radius: 25px;
+    cursor: pointer;
+}
+.settings-first-active{
+    background-color: white;
+    color: black;
+    padding: 12px 40px;
+    border-radius: 25px;
+    box-shadow: 5px 10px 15px rgba(0,0,0,0.1);
+    cursor: pointer;
+}
+.settings-first-photo
+{
+    display: flex;
+    align-items: center;
+    gap: 150px;
+    padding: 0 10px;
+}
+.settings-first-photo-title h5
+{
+
+}
+.settings-first-photo-title p{
+    font-size: 18px;
+    color: #777;
+}
+.settings-first-photo-image-container
+{
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+.settings-first-img{
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 2px solid #999;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.settings-first-line
+{
+    height: 2px;
+    width: 100%;
+    background-color: #999;
+}
+.settings-first-input{
+    padding: 20px;
+    border-radius: 10px;
+    border: solid 2px #0338a3;
+    margin-bottom: 30px;
+}
+.settings-first-button{
+    padding: 20px;
+    background-color: #0652dd;
+    font-size: 18px;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.settings-first-button:hover{
+    background-color: #0642bd;
+}
+@media (max-width: 1536px) {
+    .settings-first-container{
+        width: 1366px;
+    }
+
+}
+@media (max-width: 1366px) {
+    .settings-first-container{
+        width: 1280px;
+    }
+
+}
+@media (max-width: 1280px) {
+    .settings-first-container{
+        width: 1024px;
+        padding: 0 20px;
+    }
+
+}
+@media (max-width: 1024px) {
+    .settings-first-container{
+        width: 768px;
+    }
+}
+@media (max-width: 768px) {
+    .settings-first-container{
+        width: 640px;
+    }
+}
+@media (max-width: 640px) {
+    .settings-first-container{
+        width: auto;
+    }
+
+}
