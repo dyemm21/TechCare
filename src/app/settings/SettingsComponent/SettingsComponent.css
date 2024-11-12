@@ -3,13 +3,13 @@
 }
 .settings-first-container{
     width: 1536px;
-    padding: 100px 50px 0 50px;
+    padding: 100px 50px 80px 50px;
     margin: auto;
 }
 .settings-first-content {
     display: flex;
     justify-content: space-between;
-    height: calc(100vh - 160px);
+    min-height: calc(100vh - 160px);
 }
 .services-first-head
 {
@@ -218,7 +218,7 @@
 @media (max-width: 1280px) {
     .settings-first-container{
         width: 1024px;
-        padding: 100px 20px 0 20px;
+        padding: 100px 20px 100px 20px;
     }
     .settings-first-sections
     {
