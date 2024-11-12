@@ -3,7 +3,7 @@
 }
 .settings-first-container{
     width: 1536px;
-    padding: 100px 50px 80px 50px;
+    padding: 50px 50px 80px 50px;
     margin: auto;
 }
 .settings-first-content {
@@ -187,7 +187,7 @@
     color: white;
     font-size: 16px;
     border-radius: 10px;
-    width: 98%;
+    width: 100%;
     border: none;
     cursor: pointer;
     transition: background-color 0.3s;
@@ -218,7 +218,7 @@
 @media (max-width: 1280px) {
     .settings-first-container{
         width: 1024px;
-        padding: 100px 20px 100px 20px;
+        padding: 50px 20px 100px 20px;
     }
     .settings-first-sections
     {
