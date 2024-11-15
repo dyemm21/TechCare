@@ -1,0 +1,138 @@
+.page-dashboard-first-back
+{
+    min-height: calc(100vh - 80px);
+}
+
+.page-dashboard-first-container{
+    width: 1536px;
+    padding: 50px 50px 100px 50px;
+    margin: auto;
+}
+.page-dashboard{
+    display: flex;
+    min-height: calc(100vh - 135px);
+}
+.page-dashboard-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    background-color: rgba(245, 245, 245, 0.3);
+    width: 300px;
+    border: 3px solid #c3c3c3;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    padding: 30px 30px;
+}
+.page-dashboard-menu-head
+{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.page-dashboard-menu-head img{
+    width: 55px;
+    height: 55px;
+}
+
+.page-dashboard-menu-head h1{
+    font-size: 26px;
+    text-align: center;
+}
+.page-dashboard-menu span
+{
+    width: 100%;
+    height: 2px;
+    border-radius: 20px;
+    border: none;
+    background-color: #cfcfcf;
+}
+.page-dashboard-menu-nav
+{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+}
+.page-dashboard-menu-sections
+{
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+.page-dashboard-menu-sections div{
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+.page-dashboard-menu-sections h3{
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+}
+.page-dashboard-menu-icon
+{
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+.page-dashboard-menu-user-profile
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+.page-dashboard-menu-user-profile img{
+    width: 60px;
+    height: 60px;
+    border: 3px solid white;
+    border-radius: 50px;
+    margin-bottom: 10px;
+}
+.page-dashboard-menu-user-profile h3{
+    font-size: 22px;
+    font-weight: 600;
+}
+.page-dashboard-menu-user-profile p{
+    font-size: 16px;
+    font-weight: 500;
+    color: #444;
+}
+
+@media(max-width: 1536px)
+{
+    .page-dashboard-first-container{
+        width: 1366px;
+    }
+}
+@media(max-width: 1366px)
+{
+    .page-dashboard-first-container{
+        width: 1280px;
+    }
+}@media(max-width: 1280px)
+{
+    .page-dashboard-first-container{
+        width: 1024px;
+        padding: 50px 20px 80px 20px;
+    }
+}@media(max-width: 1024px)
+{
+    .page-dashboard-first-container{
+        width: 768px;
+    }
+    .page-dashboard-menu-head h1{
+        font-size: 24px;
+    }
+}@media(max-width: 768px)
+{
+    .page-dashboard-first-container{
+        width: 640px;
+    }
+}
+@media(max-width: 640px)
+{
+    .page-dashboard-first-container{
+        width: auto;
+    }
+}

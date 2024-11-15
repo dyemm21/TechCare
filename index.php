@@ -12,6 +12,9 @@ switch ($page) {
     case 'contact':
         include './src/app/contact/index.php';
         break;
+    case 'dashboard':
+        include './src/app/dashboard/index.php';
+        break;
     case 'settings':
         include './src/app/settings/index.php';
         break;
