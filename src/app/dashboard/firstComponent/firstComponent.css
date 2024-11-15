@@ -5,14 +5,15 @@
 
 .page-dashboard-first-container{
     width: 1536px;
-    padding: 50px 50px 100px 50px;
+    padding: 30px 50px 100px 50px;
     margin: auto;
 }
 .page-dashboard{
     display: flex;
-    min-height: calc(100vh - 135px);
+    gap: 15px;
 }
 .page-dashboard-menu {
+    min-height: calc(100vh - 120px);
     display: flex;
     flex-direction: column;
     gap: 30px;
@@ -21,13 +22,13 @@
     border: 3px solid #c3c3c3;
     border-radius: 20px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    padding: 30px 30px;
+    padding: 30px 30px 30px 30px;
 }
 .page-dashboard-menu-head
 {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 5px;
 }
 .page-dashboard-menu-head img{
     width: 55px;
@@ -36,7 +37,7 @@
 
 .page-dashboard-menu-head h1{
     font-size: 26px;
-    text-align: center;
+    /*text-align: center;*/
 }
 .page-dashboard-menu span
 {
@@ -58,16 +59,23 @@
     display: flex;
     flex-direction: column;
     gap: 25px;
+    padding-left: 5px;
 }
-.page-dashboard-menu-sections div{
+.page-dashboard-menu-sections button{
     display: flex;
     align-items: center;
     gap: 25px;
+    border: none;
+    background-color: inherit;
 }
 .page-dashboard-menu-sections h3{
     font-size: 18px;
     font-weight: 500;
     cursor: pointer;
+    transition: color 0.3s ease;
+}
+.page-dashboard-menu-sections h3:hover{
+    color: #1063ff;
 }
 .page-dashboard-menu-icon
 {
@@ -87,16 +95,145 @@
     height: 60px;
     border: 3px solid white;
     border-radius: 50px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 .page-dashboard-menu-user-profile h3{
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 600;
 }
 .page-dashboard-menu-user-profile p{
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 500;
     color: #444;
+}
+.page-dashboard-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+}
+.page-about-content-top
+{
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    /*height: 40%;*/
+    background-color: rgba(245, 245, 245, 0.3);
+    border: 3px solid #c3c3c3;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    padding: 20px 30px;
+}
+.page-about-content-top-first
+{
+    display: flex;
+    /*flex-direction: column;*/
+    gap: 90px;
+    align-items: center;
+    /*justify-content: flex-start;*/
+
+}
+.page-about-content-top-title h5
+{
+    font-size: 18px;
+}
+.page-about-content-top-title p{
+    font-size: 16px;
+    color: #777;
+}
+.page-about-content-imageContainer
+{
+    display: flex;
+    align-items: center;
+    gap: 35px;
+}
+.page-about-content-imageContainer img{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid #999;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.page-about-content-image-delete{
+    font-size: 18px;
+    color: #b10404;
+    cursor: pointer;
+}
+.page-about-content-image-update{
+    font-size: 18px;
+    color: #0652dd;
+    cursor: pointer;
+}
+.page-about-content-top-second{
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 0 10px;
+    margin-bottom: 10px;
+}
+.page-about-content-top-second-data{
+    display: flex;
+    align-items: center;
+}
+.page-about-content-top-second-data h5{
+    font-size: 16px;
+    color: #353535;
+    width: 250px;
+}
+.page-about-content-top-second-data input{
+    padding: 15px 15px 15px 10px;
+    border-radius: 10px;
+    border: 2px solid #eaeaea;
+    width: 100%;
+    box-shadow: 2px 2px 2px rgba(0,0,0,0.1);
+    font-size: 15px;
+}
+.page-about-content-top-second-contact
+{
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 0 10px;
+}
+.page-about-content-top-first-contact-subsections
+{
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+.page-about-content-top-second-contact-data
+{
+    display: flex;
+    align-items: center;
+    width: 50%;
+    justify-content: space-between;
+}
+.page-about-content-top-second-contact-data h5
+{
+    font-size: 16px;
+    color: #353535;
+}
+.page-about-content-top-second-contact-data input
+{
+    padding: 15px 15px 15px 10px;
+    border-radius: 10px;
+    border: 2px solid #eaeaea;
+    width: 70%;
+    box-shadow: 2px 2px 2px rgba(0,0,0,0.1);
+    font-size: 15px;
+}
+
+.page-about-content-bottom
+{
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    height: 100%;
+    background-color: rgba(245, 245, 245, 0.3);
+    border: 3px solid #c3c3c3;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    padding: 30px 30px;
 }
 
 @media(max-width: 1536px)
