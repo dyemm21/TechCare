@@ -7,8 +7,8 @@
                 <a href="?page=about">About</a>
                 <a href="?page=services">Services</a>
                 <a href="?page=contact">Contact</a>
-<!--                <a href="?page=dashboard">Dashboard</a>-->
-                <a href="?page=settings">Settings</a>
+                <a href="?page=dashboard">Dashboard</a>
+<!--                <a href="?page=settings">Settings</a>-->
                 <a href="?page=login">
                     <button class="button">Login</button>
                 </a>

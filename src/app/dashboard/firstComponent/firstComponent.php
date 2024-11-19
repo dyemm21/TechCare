@@ -1,5 +1,5 @@
 <?php
-$section = isset($_POST['section']) ? $_POST['section'] : 'general';
+$section = isset($_POST['section']) ? $_POST['section'] : 'profile';
 ?>
 
 
@@ -17,6 +17,14 @@ $section = isset($_POST['section']) ? $_POST['section'] : 'general';
                         <button type="submit" name="section" value="profile">
                             <img src="/public/profile_icon.svg" alt="profile-icon" class="page-dashboard-menu-icon"/>
                             <h3>Profil</h3>
+                        </button>
+                        <button type="submit" name="section" value="password">
+                            <img src="/public/password_icon.svg" alt="contact-icon" class="page-dashboard-menu-icon"/>
+                            <h3>Hasło</h3>
+                        </button>
+                        <button type="submit" name="section" value="address">
+                            <img src="/public/address_icon.svg" alt="profile-icon" class="page-dashboard-menu-icon"/>
+                            <h3>Adres</h3>
                         </button>
                         <button type="submit" name="section" value="contact">
                             <img src="/public/contact_icon.svg" alt="contact-icon" class="page-dashboard-menu-icon"/>
@@ -51,26 +59,32 @@ $section = isset($_POST['section']) ? $_POST['section'] : 'general';
                     <div class="page-about-content-top-second">
                         <div class="page-about-content-top-second-data">
                             <h5>Firstname</h5>
-                            <input type="text" placeholder="Firstname" value="Daniel"/>
+                            <input type="text" placeholder="Firstname" value="Jan"/>
                         </div>
                         <div class="page-about-content-top-second-data">
                             <h5>Lastname</h5>
-                            <input type="text" placeholder="Lastname" value="Karolak"/>
+                            <input type="text" placeholder="Lastname" value="Kowalski"/>
                         </div>
                     </div>
                     <?php endif; ?>
-                    <?php if ($section === 'contact'): ?>
-                        <div class="page-about-content-top-second-contact">
-                            <div class="page-about-content-top-first-contact-subsections">
-                                <div class="page-about-content-top-second-contact-data">
-                                    <h5>Email</h5>
-                                    <input type="email" placeholder="Email" value="jkowalski@gmail.com"/>
-                                </div>
-                                <div class="page-about-content-top-second-contact-data">
-                                    <h5>Country</h5>
-                                    <input type="text" placeholder="Country" value="Poland"/>
-                                </div>
+                    <?php if ($section === 'password'): ?>
+                        <div class="page-about-content-top-second">
+                            <div class="page-about-content-top-second-data">
+                                <h5>Last Password</h5>
+                                <input type="password" placeholder="Password" value="dsab123"/>
                             </div>
+                            <div class="page-about-content-top-second-data">
+                                <h5>New Password</h5>
+                                <input type="password" placeholder="Password" value="sdajkk123d45"/>
+                            </div>
+                            <div class="page-about-content-top-second-data">
+                                <h5>Repeat Password</h5>
+                                <input type="password" placeholder="Password" value="sdajkk123d45"/>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                    <?php if ($section === 'address'): ?>
+                        <div class="page-about-content-top-second-contact">
                             <div class="page-about-content-top-first-contact-subsections">
                                 <div class="page-about-content-top-second-contact-data">
                                     <h5>City</h5>
@@ -90,6 +104,18 @@ $section = isset($_POST['section']) ? $_POST['section'] : 'general';
                                     <h5>Number</h5>
                                     <input type="number" placeholder="Number" value="42"/>
                                 </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                    <?php if ($section === 'contact'): ?>
+                        <div class="page-about-content-top-second">
+                            <div class="page-about-content-top-second-data">
+                                <h5>Phone Number</h5>
+                                <input type="number" placeholder="Phone Number" value="987654321"/>
+                            </div>
+                            <div class="page-about-content-top-second-data">
+                                <h5>Email</h5>
+                                <input type="email" placeholder="Email" value="jkowalski@gmail.com"/>
                             </div>
                         </div>
                     <?php endif; ?>
@@ -118,7 +144,7 @@ $section = isset($_POST['section']) ? $_POST['section'] : 'general';
                     <?php endif; ?>
                 </div>
                 <div class="page-about-content-bottom">
-
+                    Test test
                 </div>
             </div>
         </div>
