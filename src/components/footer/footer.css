@@ -1,5 +1,9 @@
 .footer-back{
-
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 15px;
+    padding-top: 25px;
+    background-color: #fafafa;
 }
 .footer-container{
     width: 1536px;

@@ -1,5 +1,9 @@
 .navbar-back{
-    /*background-color: red;*/
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 10px;
+    padding: 10px 0 14px 0;
+    /*background-color: #fcfcfc;*/
 }
 .navbar-container{
     width: 1536px;
@@ -28,6 +32,7 @@
     gap: 35px;
     align-items: center;
     cursor: pointer;
+    font-size: 20px;
 }
 .button{
     min-width: 100px;

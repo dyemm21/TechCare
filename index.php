@@ -1,6 +1,25 @@
-
 <?php
+require 'db.php';
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 $page = $_GET['page'] ?? 'home';
+
+$isLoggedIn = isset($_SESSION['LoginId']);
+
+$publicPages = ['home', 'login', 'register'];
+
+if ($isLoggedIn && in_array($page, ['login', 'register'])) {
+    header('Location: ?page=home');
+    exit();
+}
+
+if (!$isLoggedIn && !in_array($page, $publicPages)) {
+    header('Location: ?page=login');
+    exit();
+}
 
 switch ($page) {
     case 'about':
@@ -29,9 +48,5 @@ switch ($page) {
         break;
 }
 ?>
-<?php include './src/components/header/header.php'; ?>
 
-<!--<div class="container">-->
-<!---->
-<!--</div>-->
-
+<?php include './src/components/header/index.php'; ?>

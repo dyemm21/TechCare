@@ -2,10 +2,9 @@
 {
     min-height: calc(100vh - 80px);
 }
-
 .page-dashboard-first-container{
     width: 1536px;
-    padding: 30px 50px 100px 50px;
+    padding: 35px 50px 100px 50px;
     margin: auto;
 }
 .page-dashboard{
@@ -13,7 +12,7 @@
     gap: 15px;
 }
 .page-dashboard-menu {
-    min-height: calc(100vh - 120px);
+    min-height: calc(100vh - 125px);
     display: flex;
     flex-direction: column;
     gap: 30px;
@@ -29,14 +28,17 @@
     display: flex;
     align-items: center;
     gap: 5px;
+
 }
 .page-dashboard-menu-head img{
     width: 55px;
     height: 55px;
+    cursor: pointer;
 }
 
 .page-dashboard-menu-head h1{
     font-size: 26px;
+    cursor: pointer;
     /*text-align: center;*/
 }
 .page-dashboard-menu span
@@ -122,7 +124,8 @@
     border: 3px solid #c3c3c3;
     border-radius: 20px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    padding: 20px 30px;
+    padding: 30px 30px 20px 30px;
+    position: relative;
 }
 .page-about-content-top-first
 {
@@ -178,13 +181,13 @@
 .page-about-content-top-second-data h5{
     font-size: 16px;
     color: #353535;
-    width: 250px;
+    width: 200px;
 }
 .page-about-content-top-second-data input{
     padding: 15px 15px 15px 10px;
     border-radius: 10px;
     border: 2px solid #eaeaea;
-    width: 100%;
+    width: 70%;
     box-shadow: 2px 2px 2px rgba(0,0,0,0.1);
     font-size: 15px;
 }
@@ -205,7 +208,7 @@
 {
     display: flex;
     align-items: center;
-    width: 50%;
+    width: 44%;
     justify-content: space-between;
 }
 .page-about-content-top-second-contact-data h5
@@ -235,6 +238,140 @@
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     padding: 30px 30px;
 }
+.page-dashboard-button-logout
+{
+    background-color: #0652dd;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.page-dashboard-button-logout:hover{
+    background-color: #0642bd;
+}
+.page-dashboard-button-logout button{
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+.page-dashboard-edit-profile
+{
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    right: 15px;
+    top: 10px;
+}
+.page-dashboard-edit-profile img{
+    width: 40px;
+    height: 40px;
+}
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(3px);
+    z-index: 10;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    min-width: 800px;
+    height: auto;
+    border-radius: 10px;
+    padding: 20px 30px 30px 30px;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+.modal-content h2{
+    font-size: 24px;
+    font-weight: 600;
+}
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 40px;
+    cursor: pointer;
+    color: #555;
+}
+.page-dashboard-edit-profile-container
+{
+    margin: 30px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+.page-dashboard-edit-profile-container-button
+{
+    width: 100%;
+    background-color: #3977ed;
+    color: white;
+    border-radius: 10px;
+    border: none;
+    padding: 15px 20px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+.page-dashboard-edit-profile-container-button:hover
+{
+    background-color: #2158ca;
+}
+
+.page-dashboard-edit-profile-container-data{
+    display: flex;
+    align-items: center;
+}
+.page-dashboard-edit-profile-container-data h5{
+    font-size: 16px;
+    color: #353535;
+    min-width: 200px;
+}
+.page-dashboard-edit-profile-container-data input{
+    padding: 15px 15px 15px 10px;
+    border-radius: 10px;
+    border: 2px solid #eaeaea;
+    width: 100%;
+    box-shadow: 2px 2px 2px rgba(0,0,0,0.1);
+    font-size: 15px;
+}
+.page-dashboard-edit-profile-container-address
+{
+    display: flex;
+    align-items: center;
+    width: 50%;
+    justify-content: space-between;
+}
+.page-dashboard-edit-profile-container-address h5{
+    font-size: 16px;
+    color: #353535;
+    width: 200px;
+}
+.page-dashboard-edit-profile-container-address input{
+    padding: 15px 15px 15px 10px;
+    border-radius: 10px;
+    border: 2px solid #eaeaea;
+    width: 70%;
+    box-shadow: 2px 2px 2px rgba(0,0,0,0.1);
+    font-size: 15px;
+}
+
 
 @media(max-width: 1536px)
 {
