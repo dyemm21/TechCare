@@ -108,11 +108,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_password'])) {
     $newPassword = $_POST['new_password'] ?? null;
     $repeatNewPassword = $_POST['repeat_new_password'] ?? null;
 
-    if ($LoginId && $newCurrentPassword && $newPassword && $repeatNewPassword && $newPassword === $repeatNewPassword) {
-        $stmt = $conn->prepare("UPDATE logowanie SET Haslo = ? WHERE Id_Logowania  = ?");
-        $stmt->execute([$newPassword, $LoginId]);
+    $stmt = $conn->prepare("SELECT Haslo FROM logowanie WHERE Id_Logowania = ?");
+    $stmt->execute([$LoginId]);
+    $user= $stmt->fetch(PDO::FETCH_ASSOC);
+    if($user)
+    {
+        $password = $user['Haslo'];
+    }
+    else {
+        echo "Użytkownik nie znaleziony.";
+    }
 
-//        dokonczyc
+
+    if ($user && $newCurrentPassword && $newPassword && $repeatNewPassword && $newPassword === $repeatNewPassword && password_verify($newCurrentPassword,$password)) {
+        $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
+        $stmt = $conn->prepare("UPDATE logowanie SET Haslo = ? WHERE Id_Logowania  = ?");
+        $stmt->execute([$hashedPassword, $LoginId]);
 
     } else {
         echo "Nie udalo sie zmienic hasła uzytkownika";
@@ -263,7 +274,7 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                     <?php endif; ?>
                 </div>
                 <div class="page-about-content-bottom">
-<!--                    Orders-->
+                    Orders
                 </div>
             </div>
         </div>

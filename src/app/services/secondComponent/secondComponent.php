@@ -33,11 +33,11 @@
         </div>
         <div class="page-services-second-grid">
             <div class="page-services-second-card">
-                <img src="../../../../public/tablet_fix.jpg" alt="Smartphone Repair" class="page-services-second-image">
+                <img src="../../../../public/laptop-repair.jpg" alt="Smartphone Repair" class="page-services-second-image">
                 <div class="page-services-second-icon">
                     <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M17 2H7c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H7V4h10v16z'/%3E%3C/svg%3E" alt="Phone icon">
                 </div>
-                <h3 class="page-services-second-title">Tablet Repair</h3>
+                <h3 class="page-services-second-title">Laptop Repair</h3>
                 <p class="page-services-second-description">Ideas it would brought city, been a concise upper office propitiously necessary though</p>
                 <a href="#" class="page-services-second-read-more">Read More</a>
             </div>
