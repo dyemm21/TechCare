@@ -87,6 +87,103 @@
     content: '→';
     margin-left: 5px;
 }
+.modal-service{
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(3px);
+    z-index: 10;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content-service {
+    background-color: white;
+    min-width: 800px;
+    height: auto;
+    border-radius: 10px;
+    padding: 20px 30px 30px 30px;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+.modal-content-service h2{
+    font-size: 24px;
+    font-weight: 600;
+}
+.close-modal-service {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 40px;
+    cursor: pointer;
+    color: #555;
+}
+.page-service-add-service
+{
+    margin: 30px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+.page-service-add-service-data-button
+{
+    width: 100%;
+    background-color: #3977ed;
+    color: white;
+    border-radius: 10px;
+    border: none;
+    padding: 15px 20px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+.page-service-add-service-data-button:hover
+{
+    background-color: #2158ca;
+}
+
+.page-service-add-service-data{
+    display: flex;
+    align-items: center;
+}
+.page-service-add-service-data h5{
+    font-size: 16px;
+    color: #353535;
+    min-width: 200px;
+}
+.page-service-add-service-data input{
+    padding: 15px 15px 15px 10px;
+    border-radius: 10px;
+    border: 2px solid #eaeaea;
+    width: 100%;
+    box-shadow: 2px 2px 2px rgba(0,0,0,0.1);
+    font-size: 15px;
+}
+.page-service-add-service-data textarea{
+    padding: 15px 15px 15px 10px;
+    border-radius: 10px;
+    border: 2px solid #eaeaea;
+    width: 100%;
+    height: 150px;
+    box-shadow: 2px 2px 2px rgba(0,0,0,0.1);
+    font-size: 15px;
+}
+.page-service-add-service-data select{
+    padding: 15px 15px 15px 10px;
+    border-radius: 10px;
+    border: 2px solid #eaeaea;
+    width: 100%;
+    box-shadow: 2px 2px 2px rgba(0,0,0,0.1);
+    font-size: 15px;
+}
 
 @media (max-width: 1536px) {
     .page-services-second-container{

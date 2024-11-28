@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['email'] = $user['Email'];
         $Id_Logowania = $user['Id_Logowania'];
 
-        $stmt = $conn->prepare("SELECT Id_Klienta, Imie, Nazwisko, Id_Kontaktu, Id_Adresu, Zdjecie FROM Klienci WHERE Id_Logowania = :id_logowania");
+        $stmt = $conn->prepare("SELECT Id_Klienta, Imie, Nazwisko, Id_Kontaktu, Id_Adresu, Zdjecie,isAdmin FROM Klienci WHERE Id_Logowania = :id_logowania");
         $stmt->bindParam(':id_logowania', $Id_Logowania, PDO::PARAM_INT);
         $stmt->execute();
         $client = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -35,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION['ContactId'] = $client['Id_Kontaktu'];
             $_SESSION['AddressId'] = $client['Id_Adresu'];
             $_SESSION['photo'] = $client['Zdjecie'];
+            $_SESSION['isAdmin'] = $client['isAdmin'];
         }
 
         header("Location: ?page=dashboard");
