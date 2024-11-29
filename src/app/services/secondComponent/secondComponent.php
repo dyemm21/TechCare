@@ -85,7 +85,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-phone']))
 
     } else
     {
-        echo "Nie udalo sie dodac nowej uslugi (telefon)";
+        echo "Nie udalo sie dodac nowej uslugi (Telefon)";
+    }
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-laptop'])) {
+    $newPhoneMark = $_POST['laptop_mark'] ?? null;
+    $newPhoneModel = $_POST['laptop_model'] ?? null;
+    $newPhoneSerialNumber = $_POST['laptop_serial_number'] ?? null;
+    $newPhoneProblemDesc = $_POST['laptop_problem_description'] ?? null;
+    $newIdEmployee = $_POST['employee_id_laptop'] ?? null;
+
+    $idDevice = generateUniqueId();
+    $idOrder = generateUniqueId();
+    $idTypeDevice = "2116961742";
+
+    $newDateReception = (new DateTime())->format('Y-m-d');
+    $idStatus = "2116961730";
+    $idService = "2116961797";
+
+    if ($newPhoneMark &&  $newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
+
+        try {
+            $stmt = $conn->prepare("INSERT INTO urządzenia (Id_Urządzenia, Id_Klienta, Id_TypuUrządzenia, Marka, Model, Numer_Seryjny, Opis_problemu) VALUES (:id_device, :id_client, :id_type_device, :mark, :model, :serial_number, :description)");
+
+            $stmt->bindParam(':id_device', $idDevice);
+            $stmt->bindParam(':id_client',$ClientId );
+            $stmt->bindParam(':id_type_device', $idTypeDevice);
+            $stmt->bindParam(':mark', $newPhoneMark);
+            $stmt->bindParam(':model', $newPhoneModel);
+            $stmt->bindParam(':serial_number', $newPhoneSerialNumber);
+            $stmt->bindParam(':description', $newPhoneProblemDesc);
+            $stmt->execute();
+
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service)");
+
+            $stmt->bindParam(':id_order', $idOrder);
+            $stmt->bindParam(':id_device',$idDevice );
+            $stmt->bindParam(':id_employee', $newIdEmployee);
+            $stmt->bindParam(':date_reception', $newDateReception);
+            $stmt->bindParam(':issue_desc', $newPhoneProblemDesc);
+            $stmt->bindParam(':id_status', $idStatus);
+            $stmt->bindParam(':id_service', $idService);
+            $stmt->execute();
+
+            header('Location: ?page=dashboard');
+            exit();
+
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            echo "An error occurred. Please try again.";
+        }
+
+    } else
+    {
+        echo "Nie udalo sie dodac nowej uslugi (Laptop)";
     }
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-iphone'])) {
@@ -138,7 +191,166 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-iphone'])
 
     } else
     {
-        echo "Nie udalo sie dodac nowej uslugi (iphone)";
+        echo "Nie udalo sie dodac nowej uslugi (iPhone)";
+    }
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-macbook'])) {
+    $newPhoneModel = $_POST['macbook_model'] ?? null;
+    $newPhoneSerialNumber = $_POST['macbook_serial_number'] ?? null;
+    $newPhoneProblemDesc = $_POST['macbook_problem_description'] ?? null;
+    $newIdEmployee = $_POST['macbook_employee_id'] ?? null;
+
+    $idDevice = generateUniqueId();
+    $idOrder = generateUniqueId();
+    $idTypeDevice = "2116961744";
+    $Iphone = "MacBook";
+
+    $newDateReception = (new DateTime())->format('Y-m-d');
+    $idStatus = "2116961730";
+    $idService = "2116961793";
+
+    if ($newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
+
+        try {
+            $stmt = $conn->prepare("INSERT INTO urządzenia (Id_Urządzenia, Id_Klienta, Id_TypuUrządzenia, Marka, Model, Numer_Seryjny, Opis_problemu) VALUES (:id_device, :id_client, :id_type_device, :mark, :model, :serial_number, :description)");
+
+            $stmt->bindParam(':id_device', $idDevice);
+            $stmt->bindParam(':id_client',$ClientId );
+            $stmt->bindParam(':id_type_device', $idTypeDevice);
+            $stmt->bindParam(':mark', $Iphone);
+            $stmt->bindParam(':model', $newPhoneModel);
+            $stmt->bindParam(':serial_number', $newPhoneSerialNumber);
+            $stmt->bindParam(':description', $newPhoneProblemDesc);
+            $stmt->execute();
+
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service)");
+
+            $stmt->bindParam(':id_order', $idOrder);
+            $stmt->bindParam(':id_device',$idDevice );
+            $stmt->bindParam(':id_employee', $newIdEmployee);
+            $stmt->bindParam(':date_reception', $newDateReception);
+            $stmt->bindParam(':issue_desc', $newPhoneProblemDesc);
+            $stmt->bindParam(':id_status', $idStatus);
+            $stmt->bindParam(':id_service', $idService);
+            $stmt->execute();
+
+            header('Location: ?page=dashboard');
+            exit();
+
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            echo "An error occurred. Please try again.";
+        }
+
+    } else
+    {
+        echo "Nie udalo sie dodac nowej uslugi (iPhone)";
+    }
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-ipad'])) {
+    $newPhoneModel = $_POST['ipad_model'] ?? null;
+    $newPhoneSerialNumber = $_POST['ipad_serial_number'] ?? null;
+    $newPhoneProblemDesc = $_POST['ipad_problem_description'] ?? null;
+    $newIdEmployee = $_POST['ipad_employee_id'] ?? null;
+
+    $idDevice = generateUniqueId();
+    $idOrder = generateUniqueId();
+    $idTypeDevice = "2116961745";
+    $Iphone = "iPad";
+
+    $newDateReception = (new DateTime())->format('Y-m-d');
+    $idStatus = "2116961730";
+    $idService = "2116961795";
+
+    if ($newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
+
+        try {
+            $stmt = $conn->prepare("INSERT INTO urządzenia (Id_Urządzenia, Id_Klienta, Id_TypuUrządzenia, Marka, Model, Numer_Seryjny, Opis_problemu) VALUES (:id_device, :id_client, :id_type_device, :mark, :model, :serial_number, :description)");
+
+            $stmt->bindParam(':id_device', $idDevice);
+            $stmt->bindParam(':id_client',$ClientId );
+            $stmt->bindParam(':id_type_device', $idTypeDevice);
+            $stmt->bindParam(':mark', $Iphone);
+            $stmt->bindParam(':model', $newPhoneModel);
+            $stmt->bindParam(':serial_number', $newPhoneSerialNumber);
+            $stmt->bindParam(':description', $newPhoneProblemDesc);
+            $stmt->execute();
+
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service)");
+
+            $stmt->bindParam(':id_order', $idOrder);
+            $stmt->bindParam(':id_device',$idDevice );
+            $stmt->bindParam(':id_employee', $newIdEmployee);
+            $stmt->bindParam(':date_reception', $newDateReception);
+            $stmt->bindParam(':issue_desc', $newPhoneProblemDesc);
+            $stmt->bindParam(':id_status', $idStatus);
+            $stmt->bindParam(':id_service', $idService);
+            $stmt->execute();
+
+            header('Location: ?page=dashboard');
+            exit();
+
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            echo "An error occurred. Please try again.";
+        }
+
+    } else
+    {
+        echo "Nie udalo sie dodac nowej uslugi (iPad)";
+    }
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])) {
+    $newPhoneMark = $_POST['tablet_mark'] ?? null;
+    $newPhoneModel = $_POST['tablet_model'] ?? null;
+    $newPhoneSerialNumber = $_POST['tablet_serial_number'] ?? null;
+    $newPhoneProblemDesc = $_POST['tablet_problem_description'] ?? null;
+    $newIdEmployee = $_POST['employee_id_tablet'] ?? null;
+
+    $idDevice = generateUniqueId();
+    $idOrder = generateUniqueId();
+    $idTypeDevice = "2116961746";
+
+    $newDateReception = (new DateTime())->format('Y-m-d');
+    $idStatus = "2116961730";
+    $idService = "2116961794";
+
+    if ($newPhoneMark &&  $newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
+
+        try {
+            $stmt = $conn->prepare("INSERT INTO urządzenia (Id_Urządzenia, Id_Klienta, Id_TypuUrządzenia, Marka, Model, Numer_Seryjny, Opis_problemu) VALUES (:id_device, :id_client, :id_type_device, :mark, :model, :serial_number, :description)");
+
+            $stmt->bindParam(':id_device', $idDevice);
+            $stmt->bindParam(':id_client',$ClientId );
+            $stmt->bindParam(':id_type_device', $idTypeDevice);
+            $stmt->bindParam(':mark', $newPhoneMark);
+            $stmt->bindParam(':model', $newPhoneModel);
+            $stmt->bindParam(':serial_number', $newPhoneSerialNumber);
+            $stmt->bindParam(':description', $newPhoneProblemDesc);
+            $stmt->execute();
+
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service)");
+
+            $stmt->bindParam(':id_order', $idOrder);
+            $stmt->bindParam(':id_device',$idDevice );
+            $stmt->bindParam(':id_employee', $newIdEmployee);
+            $stmt->bindParam(':date_reception', $newDateReception);
+            $stmt->bindParam(':issue_desc', $newPhoneProblemDesc);
+            $stmt->bindParam(':id_status', $idStatus);
+            $stmt->bindParam(':id_service', $idService);
+            $stmt->execute();
+
+            header('Location: ?page=dashboard');
+            exit();
+
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            echo "An error occurred. Please try again.";
+        }
+
+    } else
+    {
+        echo "Nie udalo sie dodac nowej uslugi (Tablet)";
     }
 }
 
@@ -273,19 +485,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-iphone'])
                     <form method="post">
                         <div class="page-service-add-service">
                             <div class="page-service-add-service-data">
-                                <h5>Procesor</h5>
-                                <input type="text" name="Procesor" placeholder="Procesor" required>
+                                <h5>Model iPad'a</h5>
+                                <input type="text" name="ipad_model" placeholder="Model iPada" required>
                             </div>
                             <div class="page-service-add-service-data">
-                                <h5>Karta graficzna</h5>
-                                <input type="password" name="Karta graficzna" placeholder="Karta graficzna" required>
+                                <h5>Numer Seryjny</h5>
+                                <input type="text" name="ipad_serial_number" placeholder="Numer Seryjny" required>
                             </div>
                             <div class="page-service-add-service-data">
                                 <h5>Opis problemu</h5>
-                                <textarea name="phone_problem" placeholder="Opis problemu" required></textarea>
+                                <textarea name="ipad_problem_description" placeholder="Opis problemu" required></textarea>
+                            </div>
+                            <div class="page-service-add-service-data">
+                                <h5>Wybierz pracownika</h5>
+                                <select name="ipad_employee_id" required>
+                                    <?php echo $options; ?>
+                                </select>
                             </div>
                         </div>
-                        <button type="submit" name="add-service-dektop" class="page-service-add-service-data-button">Zapisz zmiany</button>
+                        <button type="submit" name="add-service-ipad" class="page-service-add-service-data-button">Zapisz zmiany</button>
                     </form>
                 `;
             }
@@ -295,20 +513,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-iphone'])
                     <form method="post">
                         <div class="page-service-add-service">
                             <div class="page-service-add-service-data">
-                                <h5>Nazwa kamery</h5>
-                                <input type="text" name="Nazwa kamery" placeholder="Nazwa kamery" required>
+                                <h5>Marka Tabletu</h5>
+                                <input type="text" name="tablet_mark" placeholder="Marka Tabletu" required>
+                            </div>
+                            <div class="page-service-add-service-data">
+                                <h5>Model Tabletu</h5>
+                                <input type="text" name="tablet_model" placeholder="Model Tabletu" required>
                             </div>
                             <div class="page-service-add-service-data">
                                 <h5>Numer Seryjny</h5>
-                                <input type="text" name="Numer Seryjny" placeholder="Numer Seryjny" required>
-                            </div>
-                            <div class="page-service-add-service-data">
-                                <h5>Obiektyw</h5>
-                                <input type="text" name="Obiektyw" placeholder="Obiektyw" required>
+                                <input type="text" name="tablet_serial_number" placeholder="Numer Seryjny" required>
                             </div>
                             <div class="page-service-add-service-data">
                                 <h5>Opis problemu</h5>
-                                <textarea name="phone_problem" placeholder="Opis problemu" required></textarea>
+                                <textarea name="tablet_problem_description" placeholder="Opis problemu" required></textarea>
+                            </div>
+                            <div class="page-service-add-service-data">
+                                <h5>Wybierz pracownika</h5>
+                                <select name="employee_id_tablet" required>
+                                    <?php echo $options; ?>
+                                </select>
                             </div>
                         </div>
                         <button type="submit" name="add-service-tablet" class="page-service-add-service-data-button">Zapisz zmiany</button>
@@ -321,20 +545,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-iphone'])
                     <form method="post">
                         <div class="page-service-add-service">
                             <div class="page-service-add-service-data">
-                                <h5>Nazwa kamery</h5>
-                                <input type="text" name="Nazwa kamery" placeholder="Nazwa kamery" required>
+                                <h5>Marka Laptopu</h5>
+                                <input type="text" name="laptop_mark" placeholder="Marka Laptopu" required>
+                            </div>
+                            <div class="page-service-add-service-data">
+                                <h5>Model Laptopu</h5>
+                                <input type="text" name="laptop_model" placeholder="Model Laptopu" required>
                             </div>
                             <div class="page-service-add-service-data">
                                 <h5>Numer Seryjny</h5>
-                                <input type="text" name="Numer Seryjny" placeholder="Numer Seryjny" required>
-                            </div>
-                            <div class="page-service-add-service-data">
-                                <h5>Obiektyw</h5>
-                                <input type="text" name="Obiektyw" placeholder="Obiektyw" required>
+                                <input type="text" name="laptop_serial_number" placeholder="Numer Seryjny" required>
                             </div>
                             <div class="page-service-add-service-data">
                                 <h5>Opis problemu</h5>
-                                <textarea name="phone_problem" placeholder="Opis problemu" required></textarea>
+                                <textarea name="laptop_problem_description" placeholder="Opis problemu" required></textarea>
+                            </div>
+                            <div class="page-service-add-service-data">
+                                <h5>Wybierz pracownika</h5>
+                                <select name="employee_id_laptop" required>
+                                    <?php echo $options; ?>
+                                </select>
                             </div>
                         </div>
                         <button type="submit" name="add-service-laptop" class="page-service-add-service-data-button">Zapisz zmiany</button>
@@ -343,24 +573,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-iphone'])
             }
             else if (service === 'macbook') {
                 modalContent.innerHTML += `
-                    <h2>Serwis Macbook</h2>
+                    <h2>Serwis MacBook</h2>
                     <form method="post">
                         <div class="page-service-add-service">
                             <div class="page-service-add-service-data">
-                                <h5>Nazwa kamery</h5>
-                                <input type="text" name="Nazwa kamery" placeholder="Nazwa kamery" required>
+                                <h5>Model MacBook'a</h5>
+                                <input type="text" name="macbook_model" placeholder="Model MacBook'a" required>
                             </div>
                             <div class="page-service-add-service-data">
                                 <h5>Numer Seryjny</h5>
-                                <input type="text" name="Numer Seryjny" placeholder="Numer Seryjny" required>
-                            </div>
-                            <div class="page-service-add-service-data">
-                                <h5>Obiektyw</h5>
-                                <input type="text" name="Obiektyw" placeholder="Obiektyw" required>
+                                <input type="text" name="macbook_serial_number" placeholder="Numer Seryjny" required>
                             </div>
                             <div class="page-service-add-service-data">
                                 <h5>Opis problemu</h5>
-                                <textarea name="phone_problem" placeholder="Opis problemu" required></textarea>
+                                <textarea name="macbook_problem_description" placeholder="Opis problemu" required></textarea>
+                            </div>
+                            <div class="page-service-add-service-data">
+                                <h5>Wybierz pracownika</h5>
+                                <select name="macbook_employee_id" required>
+                                    <?php echo $options; ?>
+                                </select>
                             </div>
                         </div>
                         <button type="submit" name="add-service-macbook" class="page-service-add-service-data-button">Zapisz zmiany</button>
@@ -374,7 +606,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-iphone'])
                         <div class="page-service-add-service">
                             <div class="page-service-add-service-data">
                                 <h5>Model iPhone'a</h5>
-                                <input type="text" name="iphone_model" placeholder="Model Telefonu" required>
+                                <input type="text" name="iphone_model" placeholder="Model iPhone'a" required>
                             </div>
                             <div class="page-service-add-service-data">
                                 <h5>Numer Seryjny</h5>
