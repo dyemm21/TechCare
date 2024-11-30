@@ -32,7 +32,7 @@ $sql = "
         z.Id_Urządzenia,
         z.Id_Pracownika,
         z.Data_Przyjęcia,
-        z.Opis_Problemu AS Opis_Zlecenia,
+        z.Opis_Problemu,
         z.Id_Statusu,
         s.Nazwa AS Nazwa_Statusu,
         z.Data_Zakończenia,
@@ -42,14 +42,23 @@ $sql = "
         u.Marka,
         u.Model,
         u.Numer_Seryjny,
-        u.Opis_Problemu AS Opis_Urządzenia,
         p.Imie AS Imie_Pracownika,
         p.Nazwisko AS Nazwisko_Pracownika,
-        p.Stanowisko AS Stanowisko_Pracownika
+        p.Stanowisko AS Stanowisko_Pracownika,
+        z.Id_Płatności,
+        x.Nazwa_Płatności,
+        tu.Nazwa AS Nazwa_TypuUrządzenia,
+        serv.Nazwa AS Nazwa_Usługi,
+        serv.Opis AS Opis_Usługi,
+        serv.Cena AS Cena_Usługi
+        
     FROM zlecenia z
     INNER JOIN urządzenia u ON z.Id_Urządzenia = u.Id_Urządzenia
+    INNER JOIN typurządzenia tu ON u.Id_TypuUrządzenia = tu.Id_TypuUrządzenia
+    INNER JOIN usługi serv ON z.Id_Usługi = serv.Id_Usługi
     INNER JOIN status s ON z.Id_Statusu = s.Id_Statusu
     INNER JOIN pracownicy p ON z.Id_Pracownika = p.Id_Pracownika
+    INNER JOIN płatność x ON z.Id_Płatności = x.Id_Płatności
     WHERE u.Id_Klienta = :id_klienta
     ORDER BY z.Data_Przyjęcia DESC;
 ";
@@ -311,29 +320,36 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
 <!--                        </div>-->
                     <?php endif; ?>
                 </div>
-                <div class="page-about-content-bottom">
-                    <?php if (!empty($AllOrdersFromClient)): ?>
-                        <?php foreach ($AllOrdersFromClient as $order): ?>
-                            <div class="page-dashboard-orders-user-single-order">
-                                <div class="page-dashboard-orders-user-single-section-title">Id: </div>
-                                <div class="page-dashboard-orders-user-single-id"><?php echo htmlspecialchars($order['Id_Zlecenia']); ?></div>
-                                <div class="page-dashboard-orders-user-single-section-title">Przyjęcie: </div>
-                                <div class="page-dashboard-orders-user-single-date-reception"><?php echo htmlspecialchars($order['Data_Przyjęcia']); ?></div>
-                                <div class="page-dashboard-orders-user-single-section-title">Zakończenie: </div>
-                                <div class="page-dashboard-orders-user-single-data-ending"><?php echo $order['Data_Zakończenia'] === null ? "W trakcie" : htmlspecialchars($order['Data_Zakończenia']); ?></div>
-                                <div class="page-dashboard-orders-user-single-section-device"><?php echo htmlspecialchars($order['Marka'] . " " . $order['Model']); ?></div>
-                                <div class="page-dashboard-orders-user-single-show" type="submit" data-order="order" >Pokaż</div>
-                                <div class="page-dashboard-orders-user-single-delete">Usuń</div>
-                                <input type="hidden" class="page-dashboard-orders-user-single-serial_number" value="<?php echo htmlspecialchars($order['Numer_Seryjny']); ?>"/>
-                                <input type="hidden" class="page-dashboard-orders-user-single-issue_desc" value="<?php echo htmlspecialchars($order['Opis_Zlecenia']); ?>"/>
-                                <input type="hidden" class="page-dashboard-orders-user-single-status" value="<?php echo htmlspecialchars($order['Nazwa_Statusu']); ?>"/>
-                                <input type="hidden" class="page-dashboard-orders-user-single-employee-name" value="<?php echo htmlspecialchars($order['Imie_Pracownika']); ?>"/>
-                                <input type="hidden" class="page-dashboard-orders-user-single-employee-surname" value="<?php echo htmlspecialchars($order['Nazwisko_Pracownika']); ?>"/>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <p>Brak dodanych urządzeń przez klienta.</p>
-                    <?php endif; ?>
+                <div class="page-dashboard-content-bottom">
+                    <div class="page-dashboard-content-bottom-details">
+                        <?php if (!empty($AllOrdersFromClient)): ?>
+                            <?php foreach ($AllOrdersFromClient as $order): ?>
+                                <div class="page-dashboard-orders-user-single-order">
+                                    <div class="page-dashboard-orders-user-single-section-title">Id: </div>
+                                    <div class="page-dashboard-orders-user-single-id"><?php echo htmlspecialchars($order['Id_Zlecenia']); ?></div>
+                                    <div class="page-dashboard-orders-user-single-section-title">Przyjęcie: </div>
+                                    <div class="page-dashboard-orders-user-single-date-reception"><?php echo htmlspecialchars($order['Data_Przyjęcia']); ?></div>
+                                    <div class="page-dashboard-orders-user-single-section-title">Zakończenie: </div>
+                                    <div class="page-dashboard-orders-user-single-data-ending"><?php echo $order['Data_Zakończenia'] === null ? "W trakcie" : htmlspecialchars($order['Data_Zakończenia']); ?></div>
+                                    <div class="page-dashboard-orders-user-single-section-device"><?php echo htmlspecialchars($order['Marka'] . " " . $order['Model']); ?></div>
+                                    <div class="page-dashboard-orders-user-single-show" type="submit" data-order="order" >Pokaż</div>
+                                    <div class="page-dashboard-orders-user-single-delete">Anuluj</div>
+                                    <input type="hidden" class="page-dashboard-orders-user-single-serial_number" value="<?php echo htmlspecialchars($order['Numer_Seryjny']); ?>"/>
+                                    <input type="hidden" class="page-dashboard-orders-user-single-issue_desc" value="<?php echo htmlspecialchars($order['Opis_Problemu']); ?>"/>
+                                    <input type="hidden" class="page-dashboard-orders-user-single-status" value="<?php echo htmlspecialchars($order['Nazwa_Statusu']); ?>"/>
+                                    <input type="hidden" class="page-dashboard-orders-user-single-employee-name" value="<?php echo htmlspecialchars($order['Imie_Pracownika']); ?>"/>
+                                    <input type="hidden" class="page-dashboard-orders-user-single-employee-surname" value="<?php echo htmlspecialchars($order['Nazwisko_Pracownika']); ?>"/>
+                                    <input type="hidden" class="page-dashboard-orders-user-single-payment" value="<?php echo htmlspecialchars($order['Nazwa_Płatności']); ?>"/>
+                                    <input type="hidden" class="page-dashboard-orders-user-single-device-type" value="<?php echo htmlspecialchars($order['Nazwa_TypuUrządzenia']); ?>"/>
+                                    <input type="hidden" class="page-dashboard-orders-user-single-service-name" value="<?php echo htmlspecialchars($order['Nazwa_Usługi']); ?>"/>
+                                    <input type="hidden" class="page-dashboard-orders-user-single-service-price" value="<?php echo htmlspecialchars($order['Cena_Usługi']); ?>"/>
+                                    <input type="hidden" class="page-dashboard-orders-user-single-service-desc" value="<?php echo htmlspecialchars($order['Opis_Usługi']); ?>"/>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p>Brak dodanych urządzeń przez klienta.</p>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
         </div>
@@ -425,7 +441,6 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
         <div id="modal-order" class="modal-order">
             <div class="modal-content-order">
                 <button id="close-modal-order" class="close-modal-order">&times;</button>
-
             </div>
         </div>
 
@@ -472,13 +487,21 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
             const orderSerialNumber = orderRow.querySelector('.page-dashboard-orders-user-single-serial_number').value;
             const orderIssueDesc = orderRow.querySelector('.page-dashboard-orders-user-single-issue_desc').value;
             const orderStatus = orderRow.querySelector('.page-dashboard-orders-user-single-status').value;
-            const orderEmployeeName= orderRow.querySelector('.page-dashboard-orders-user-single-employee-name').value;
-            const orderEmployeeSurname= orderRow.querySelector('.page-dashboard-orders-user-single-employee-surname').value;
+            const orderEmployeeName = orderRow.querySelector('.page-dashboard-orders-user-single-employee-name').value;
+            const orderEmployeeSurname = orderRow.querySelector('.page-dashboard-orders-user-single-employee-surname').value;
+            const orderPayment = orderRow.querySelector('.page-dashboard-orders-user-single-payment').value;
+            const orderDeviceType = orderRow.querySelector('.page-dashboard-orders-user-single-device-type').value;
+            const orderServiceName = orderRow.querySelector('.page-dashboard-orders-user-single-service-name').value;
+            const orderServicePrice= orderRow.querySelector('.page-dashboard-orders-user-single-service-price').value;
+            const orderServiceDesc= orderRow.querySelector('.page-dashboard-orders-user-single-service-desc').value;
 
             const modalContent = modalOrder.querySelector('.modal-content-order');
             modalContent.innerHTML = `
                 <button id="close-modal-order" class="close-modal-order">&times;</button>
-                <h2 class="modal-order-details-title">Szczegóły Zamówienia</h2>
+                <div class="model-content-order-head">
+                    <h3 class="modal-content-order-title">Szczegóły Zamówienia</h3>
+                </div>
+<!--                <h2 class="modal-order-details-title">Szczegóły Zamówienia</h2>-->
                 <div class="modal-order-details">
                     <div class="modal-order-detail">
                         <p>ID Zamówienia:</p>
@@ -486,11 +509,27 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                     </div>
                     <div class="modal-order-detail">
                         <p>Urządzenie:</p>
+                        <div>${orderDeviceType}</div>
+                    </div>
+                    <div class="modal-order-detail">
+                        <p>Nazwa:</p>
                         <div>${orderDevice}</div>
                     </div>
                     <div class="modal-order-detail">
                         <p>Numer Seryjny:</p>
                         <div>${orderSerialNumber}</div>
+                    </div>
+                    <div class="modal-order-detail">
+                        <p>Opis Problemu:</p>
+                        <div>${orderIssueDesc}</div>
+                    </div>
+                    <div class="modal-order-detail">
+                        <p>Status Zamówienia:</p>
+                        <div>${orderStatus}</div>
+                    </div>
+                    <div class="modal-order-detail">
+                        <p>Metoda Płatności:</p>
+                        <div>${orderPayment}</div>
                     </div>
                     <div class="modal-order-detail">
                         <p>Data Przyjęcia:</p>
@@ -501,16 +540,16 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                         <div>${orderDateCompletion}</div>
                     </div>
                     <div class="modal-order-detail">
-                        <p>Status Zamówienia:</p>
-                        <div>${orderStatus}</div>
-                    </div>
-                    <div class="modal-order-detail">
                         <p>Serwisant</p>
                         <div>${orderEmployeeName} ${orderEmployeeSurname}</div>
                     </div>
                     <div class="modal-order-detail">
-                        <p>Opis Zlecenia Naprawy:</p>
-                        <div>${orderIssueDesc}</div>
+                        <p>Nazwa Usługi:</p>
+                        <div>${orderServiceDesc}</div>
+                    </div>
+                    <div class="modal-order-detail">
+                        <p>Cena Usługi:</p>
+                        <div>${orderServicePrice} zł</div>
                     </div>
                 </div>
             `;

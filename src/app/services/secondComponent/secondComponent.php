@@ -35,12 +35,118 @@ while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
         htmlspecialchars($row['Stanowisko']) . "</option>";
 }
 
+$sql = "SELECT Id_Płatności, Nazwa_Płatności FROM płatność";
+$result = $conn->query($sql);
+
+$payment_options = '';
+while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+    $payment_options .= "<option value='" . htmlspecialchars($row['Id_Płatności']) . "'>" .
+        htmlspecialchars($row['Nazwa_Płatności']);
+}
+
+$service_phone_category = 2116961740;
+
+$sql = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
+        FROM usługi 
+        WHERE Id_TypuUrządzenia = :service_phone_category";
+$stmt = $conn->prepare($sql);
+$stmt->bindParam(':service_phone_category', $service_phone_category, PDO::PARAM_INT);
+$stmt->execute();
+
+$service_phone_options = '';
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $service_phone_options .= "<option value='" . htmlspecialchars($row['Id_Usługi']) . "'>" .
+        htmlspecialchars($row['Opis']) . " - " .
+        htmlspecialchars($row['Cena']) . " zł" ."</option>";
+}
+
+$service_laptop_category = 2116961742;
+
+$sql = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
+        FROM usługi 
+        WHERE Id_TypuUrządzenia = :service_laptop_category";
+$stmt = $conn->prepare($sql);
+$stmt->bindParam(':service_laptop_category', $service_laptop_category, PDO::PARAM_INT);
+$stmt->execute();
+
+$service_laptop_options = '';
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $service_laptop_options .= "<option value='" . htmlspecialchars($row['Id_Usługi']) . "'>" .
+        htmlspecialchars($row['Opis']) . " - " .
+        htmlspecialchars($row['Cena']) . " zł" ."</option>";
+}
+
+$service_tablet_category = 2116961746;
+
+$sql = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
+        FROM usługi 
+        WHERE Id_TypuUrządzenia = :service_tablet_category";
+$stmt = $conn->prepare($sql);
+$stmt->bindParam(':service_tablet_category', $service_tablet_category, PDO::PARAM_INT);
+$stmt->execute();
+
+$service_tablet_options = '';
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $service_tablet_options .= "<option value='" . htmlspecialchars($row['Id_Usługi']) . "'>" .
+        htmlspecialchars($row['Opis']) . " - " .
+        htmlspecialchars($row['Cena']) . " zł" ."</option>";
+}
+
+$service_iphone_category = 2116961741;
+
+$sql = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
+        FROM usługi 
+        WHERE Id_TypuUrządzenia = :service_iphone_category";
+$stmt = $conn->prepare($sql);
+$stmt->bindParam(':service_iphone_category', $service_iphone_category, PDO::PARAM_INT);
+$stmt->execute();
+
+$service_iphone_options = '';
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $service_iphone_options .= "<option value='" . htmlspecialchars($row['Id_Usługi']) . "'>" .
+        htmlspecialchars($row['Opis']) . " - " .
+        htmlspecialchars($row['Cena']) . " zł" ."</option>";
+}
+
+$service_macbook_category = 2116961744;
+
+$sql = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
+        FROM usługi 
+        WHERE Id_TypuUrządzenia = :service_macbook_category";
+$stmt = $conn->prepare($sql);
+$stmt->bindParam(':service_macbook_category', $service_macbook_category, PDO::PARAM_INT);
+$stmt->execute();
+
+$service_macbook_options = '';
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $service_macbook_options .= "<option value='" . htmlspecialchars($row['Id_Usługi']) . "'>" .
+        htmlspecialchars($row['Opis']) . " - " .
+        htmlspecialchars($row['Cena']) . " zł" ."</option>";
+}
+
+$service_ipad_category = 2116961745;
+
+$sql = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
+        FROM usługi 
+        WHERE Id_TypuUrządzenia = :service_ipad_category";
+$stmt = $conn->prepare($sql);
+$stmt->bindParam(':service_ipad_category', $service_ipad_category, PDO::PARAM_INT);
+$stmt->execute();
+
+$service_ipad_options = '';
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $service_ipad_options .= "<option value='" . htmlspecialchars($row['Id_Usługi']) . "'>" .
+        htmlspecialchars($row['Opis']) . " - " .
+        htmlspecialchars($row['Cena']) . " zł" ."</option>";
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-phone'])) {
     $newPhoneMark = $_POST['phone_mark'] ?? null;
     $newPhoneModel = $_POST['phone_model'] ?? null;
     $newPhoneSerialNumber = $_POST['phone_serial_number'] ?? null;
     $newPhoneProblemDesc = $_POST['phone_problem_description'] ?? null;
     $newIdEmployee = $_POST['employee_id'] ?? null;
+    $newIdPayment = $_POST['payment_id'] ?? null;
 
     $idDevice = generateUniqueId();
     $idOrder = generateUniqueId();
@@ -48,7 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-phone']))
 
     $newDateReception = (new DateTime())->format('Y-m-d');
     $idStatus = "2116961730";
-    $idService = "2116961790";
+    $idService = $_POST['service_id_phone'] ?? null;
 
     if ($newPhoneMark &&  $newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
 
@@ -64,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-phone']))
             $stmt->bindParam(':description', $newPhoneProblemDesc);
             $stmt->execute();
 
-            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service)");
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi,Id_Płatności) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment)");
 
             $stmt->bindParam(':id_order', $idOrder);
             $stmt->bindParam(':id_device',$idDevice );
@@ -73,6 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-phone']))
             $stmt->bindParam(':issue_desc', $newPhoneProblemDesc);
             $stmt->bindParam(':id_status', $idStatus);
             $stmt->bindParam(':id_service', $idService);
+            $stmt->bindParam(':id_payment', $newIdPayment);
             $stmt->execute();
 
             header('Location: ?page=dashboard');
@@ -94,6 +201,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-laptop'])
     $newPhoneSerialNumber = $_POST['laptop_serial_number'] ?? null;
     $newPhoneProblemDesc = $_POST['laptop_problem_description'] ?? null;
     $newIdEmployee = $_POST['employee_id_laptop'] ?? null;
+    $newIdPayment = $_POST['payment_id_laptop'] ?? null;
 
     $idDevice = generateUniqueId();
     $idOrder = generateUniqueId();
@@ -101,7 +209,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-laptop'])
 
     $newDateReception = (new DateTime())->format('Y-m-d');
     $idStatus = "2116961730";
-    $idService = "2116961797";
+    $idService = $_POST['service_id_laptop'] ?? null;
 
     if ($newPhoneMark &&  $newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
 
@@ -117,7 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-laptop'])
             $stmt->bindParam(':description', $newPhoneProblemDesc);
             $stmt->execute();
 
-            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service)");
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment)");
 
             $stmt->bindParam(':id_order', $idOrder);
             $stmt->bindParam(':id_device',$idDevice );
@@ -126,6 +234,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-laptop'])
             $stmt->bindParam(':issue_desc', $newPhoneProblemDesc);
             $stmt->bindParam(':id_status', $idStatus);
             $stmt->bindParam(':id_service', $idService);
+            $stmt->bindParam(':id_payment', $newIdPayment);
             $stmt->execute();
 
             header('Location: ?page=dashboard');
@@ -146,6 +255,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-iphone'])
     $newPhoneSerialNumber = $_POST['iphone_serial_number'] ?? null;
     $newPhoneProblemDesc = $_POST['iphone_problem_description'] ?? null;
     $newIdEmployee = $_POST['iphone_employee_id'] ?? null;
+    $newIdPayment = $_POST['iphone_payment_id'] ?? null;
 
     $idDevice = generateUniqueId();
     $idOrder = generateUniqueId();
@@ -154,7 +264,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-iphone'])
 
     $newDateReception = (new DateTime())->format('Y-m-d');
     $idStatus = "2116961730";
-    $idService = "2116961793";
+    $idService = $_POST['service_id_iphone'] ?? null;
 
     if ($newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
 
@@ -170,7 +280,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-iphone'])
             $stmt->bindParam(':description', $newPhoneProblemDesc);
             $stmt->execute();
 
-            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service)");
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment)");
 
             $stmt->bindParam(':id_order', $idOrder);
             $stmt->bindParam(':id_device',$idDevice );
@@ -179,6 +289,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-iphone'])
             $stmt->bindParam(':issue_desc', $newPhoneProblemDesc);
             $stmt->bindParam(':id_status', $idStatus);
             $stmt->bindParam(':id_service', $idService);
+            $stmt->bindParam(':id_payment', $newIdPayment);
             $stmt->execute();
 
             header('Location: ?page=dashboard');
@@ -199,6 +310,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-macbook']
     $newPhoneSerialNumber = $_POST['macbook_serial_number'] ?? null;
     $newPhoneProblemDesc = $_POST['macbook_problem_description'] ?? null;
     $newIdEmployee = $_POST['macbook_employee_id'] ?? null;
+    $newIdPayment = $_POST['macbook_payment_id'] ?? null;
 
     $idDevice = generateUniqueId();
     $idOrder = generateUniqueId();
@@ -207,7 +319,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-macbook']
 
     $newDateReception = (new DateTime())->format('Y-m-d');
     $idStatus = "2116961730";
-    $idService = "2116961793";
+    $idService = $_POST['service_id_macbook'] ?? null;
 
     if ($newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
 
@@ -223,7 +335,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-macbook']
             $stmt->bindParam(':description', $newPhoneProblemDesc);
             $stmt->execute();
 
-            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service)");
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment)");
 
             $stmt->bindParam(':id_order', $idOrder);
             $stmt->bindParam(':id_device',$idDevice );
@@ -232,6 +344,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-macbook']
             $stmt->bindParam(':issue_desc', $newPhoneProblemDesc);
             $stmt->bindParam(':id_status', $idStatus);
             $stmt->bindParam(':id_service', $idService);
+            $stmt->bindParam(':id_payment', $newIdPayment);
             $stmt->execute();
 
             header('Location: ?page=dashboard');
@@ -252,6 +365,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-ipad'])) 
     $newPhoneSerialNumber = $_POST['ipad_serial_number'] ?? null;
     $newPhoneProblemDesc = $_POST['ipad_problem_description'] ?? null;
     $newIdEmployee = $_POST['ipad_employee_id'] ?? null;
+    $newIdPayment = $_POST['ipad_payment_id'] ?? null;
 
     $idDevice = generateUniqueId();
     $idOrder = generateUniqueId();
@@ -260,7 +374,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-ipad'])) 
 
     $newDateReception = (new DateTime())->format('Y-m-d');
     $idStatus = "2116961730";
-    $idService = "2116961795";
+    $idService = $_POST['service_id_ipad'] ?? null;
 
     if ($newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
 
@@ -276,7 +390,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-ipad'])) 
             $stmt->bindParam(':description', $newPhoneProblemDesc);
             $stmt->execute();
 
-            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service)");
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment)");
 
             $stmt->bindParam(':id_order', $idOrder);
             $stmt->bindParam(':id_device',$idDevice );
@@ -285,6 +399,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-ipad'])) 
             $stmt->bindParam(':issue_desc', $newPhoneProblemDesc);
             $stmt->bindParam(':id_status', $idStatus);
             $stmt->bindParam(':id_service', $idService);
+            $stmt->bindParam(':id_payment', $newIdPayment);
             $stmt->execute();
 
             header('Location: ?page=dashboard');
@@ -306,6 +421,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
     $newPhoneSerialNumber = $_POST['tablet_serial_number'] ?? null;
     $newPhoneProblemDesc = $_POST['tablet_problem_description'] ?? null;
     $newIdEmployee = $_POST['employee_id_tablet'] ?? null;
+    $newIdPayment = $_POST['payment_id_tablet'] ?? null;
+
 
     $idDevice = generateUniqueId();
     $idOrder = generateUniqueId();
@@ -313,7 +430,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
 
     $newDateReception = (new DateTime())->format('Y-m-d');
     $idStatus = "2116961730";
-    $idService = "2116961794";
+    $idService = $_POST['service_id_tablet'] ?? null;
 
     if ($newPhoneMark &&  $newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
 
@@ -329,7 +446,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
             $stmt->bindParam(':description', $newPhoneProblemDesc);
             $stmt->execute();
 
-            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service)");
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment)");
 
             $stmt->bindParam(':id_order', $idOrder);
             $stmt->bindParam(':id_device',$idDevice );
@@ -338,6 +455,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
             $stmt->bindParam(':issue_desc', $newPhoneProblemDesc);
             $stmt->bindParam(':id_status', $idStatus);
             $stmt->bindParam(':id_service', $idService);
+            $stmt->bindParam(':id_payment', $newIdPayment);
             $stmt->execute();
 
             header('Location: ?page=dashboard');
@@ -449,7 +567,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
 
             if (service === 'phone') {
                 modalContent.innerHTML += `
-                    <h2>Serwis Telefonu</h2>
+                    <div class="model-content-service-head">
+                        <h3 class="modal-content-service-title">Szczegóły Zamówienia</h3>
+                    </div>
+                    <div class="model-content-service-subtitle">
+                        <img src= "/public/order_icon_black.svg" alt="service-order-icon">
+                        <h2>Serwis Telefonu</h2>
+                    </div>
                     <form method="post">
                         <div class="page-service-add-service">
                             <div class="page-service-add-service-data">
@@ -469,19 +593,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                                 <textarea name="phone_problem_description" placeholder="Opis problemu" required></textarea>
                             </div>
                             <div class="page-service-add-service-data">
+                                <h5>Wybierz usłgugę</h5>
+                                <select name="service_id_phone" required>
+                                    <?php echo $service_phone_options; ?>
+                                </select>
+                            </div>
+                            <div class="page-service-add-service-data">
                                 <h5>Wybierz pracownika</h5>
                                 <select name="employee_id" required>
                                     <?php echo $options; ?>
                                 </select>
                             </div>
+                            <div class="page-service-add-service-data">
+                                <h5>Metoda Płatności</h5>
+                                <select name="payment_id" required>
+                                    <?php echo $payment_options; ?>
+                                </select>
+                            </div>
                         </div>
-                        <button type="submit" name="add-service-phone" class="page-service-add-service-data-button">Zapisz zmiany</button>
+                        <button type="submit" name="add-service-phone" class="page-service-add-service-data-button">Złóż zamówienie</button>
                     </form>
                 `;
             }
             else if (service === 'ipad') {
                 modalContent.innerHTML += `
-                    <h2>Serwis iPad</h2>
+                    <div class="model-content-service-head">
+                        <h3 class="modal-content-service-title">Szczegóły Zamówienia</h3>
+                    </div>
+                    <div class="model-content-service-subtitle">
+                        <img src= "/public/order_icon_black.svg" alt="service-order-icon">
+                        <h2>Serwis iPad</h2>
+                    </div>
                     <form method="post">
                         <div class="page-service-add-service">
                             <div class="page-service-add-service-data">
@@ -497,9 +639,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                                 <textarea name="ipad_problem_description" placeholder="Opis problemu" required></textarea>
                             </div>
                             <div class="page-service-add-service-data">
+                                <h5>Wybierz usłgugę</h5>
+                                <select name="service_id_ipad" required>
+                                    <?php echo $service_ipad_options; ?>
+                                </select>
+                            </div>
+                            <div class="page-service-add-service-data">
                                 <h5>Wybierz pracownika</h5>
                                 <select name="ipad_employee_id" required>
                                     <?php echo $options; ?>
+                                </select>
+                            </div>
+                            <div class="page-service-add-service-data">
+                                <h5>Metoda Płatności</h5>
+                                <select name="ipad_payment_id" required>
+                                    <?php echo $payment_options; ?>
                                 </select>
                             </div>
                         </div>
@@ -509,7 +663,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
             }
             else if (service === 'tablet') {
                 modalContent.innerHTML += `
-                    <h2>Serwis Tabletu</h2>
+                    <div class="model-content-service-head">
+                        <h3 class="modal-content-service-title">Szczegóły Zamówienia</h3>
+                    </div>
+                    <div class="model-content-service-subtitle">
+                        <img src= "/public/order_icon_black.svg" alt="service-order-icon">
+                        <h2>Serwis Tabletu</h2>
+                    </div>
                     <form method="post">
                         <div class="page-service-add-service">
                             <div class="page-service-add-service-data">
@@ -529,9 +689,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                                 <textarea name="tablet_problem_description" placeholder="Opis problemu" required></textarea>
                             </div>
                             <div class="page-service-add-service-data">
+                                <h5>Wybierz usłgugę</h5>
+                                <select name="service_id_tablet" required>
+                                    <?php echo $service_tablet_options; ?>
+                                </select>
+                            </div>
+                            <div class="page-service-add-service-data">
                                 <h5>Wybierz pracownika</h5>
                                 <select name="employee_id_tablet" required>
                                     <?php echo $options; ?>
+                                </select>
+                            </div>
+                            <div class="page-service-add-service-data">
+                                <h5>Metoda Płatności</h5>
+                                <select name="payment_id_tablet" required>
+                                    <?php echo $payment_options; ?>
                                 </select>
                             </div>
                         </div>
@@ -541,7 +713,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
             }
             else if (service === 'laptop') {
                 modalContent.innerHTML += `
-                    <h2>Serwis Laptopu</h2>
+                    <div class="model-content-service-head">
+                        <h3 class="modal-content-service-title">Szczegóły Zamówienia</h3>
+                    </div>
+                    <div class="model-content-service-subtitle">
+                        <img src= "/public/order_icon_black.svg" alt="service-order-icon">
+                        <h2>Serwis Laptopu</h2>
+                    </div>
                     <form method="post">
                         <div class="page-service-add-service">
                             <div class="page-service-add-service-data">
@@ -561,9 +739,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                                 <textarea name="laptop_problem_description" placeholder="Opis problemu" required></textarea>
                             </div>
                             <div class="page-service-add-service-data">
+                                <h5>Wybierz usłgugę</h5>
+                                <select name="service_id_laptop" required>
+                                    <?php echo $service_laptop_options; ?>
+                                </select>
+                            </div>
+                            <div class="page-service-add-service-data">
                                 <h5>Wybierz pracownika</h5>
                                 <select name="employee_id_laptop" required>
                                     <?php echo $options; ?>
+                                </select>
+                            </div>
+                            <div class="page-service-add-service-data">
+                                <h5>Metoda Płatności</h5>
+                                <select name="payment_id_laptop" required>
+                                    <?php echo $payment_options; ?>
                                 </select>
                             </div>
                         </div>
@@ -573,7 +763,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
             }
             else if (service === 'macbook') {
                 modalContent.innerHTML += `
-                    <h2>Serwis MacBook</h2>
+                    <div class="model-content-service-head">
+                        <h3 class="modal-content-service-title">Szczegóły Zamówienia</h3>
+                    </div>
+                    <div class="model-content-service-subtitle">
+                        <img src= "/public/order_icon_black.svg" alt="service-order-icon">
+                        <h2>Serwis MacBook</h2>
+                    </div>
                     <form method="post">
                         <div class="page-service-add-service">
                             <div class="page-service-add-service-data">
@@ -589,9 +785,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                                 <textarea name="macbook_problem_description" placeholder="Opis problemu" required></textarea>
                             </div>
                             <div class="page-service-add-service-data">
+                                <h5>Wybierz usłgugę</h5>
+                                <select name="service_id_macbook" required>
+                                    <?php echo $service_macbook_options; ?>
+                                </select>
+                            </div>
+                            <div class="page-service-add-service-data">
                                 <h5>Wybierz pracownika</h5>
                                 <select name="macbook_employee_id" required>
                                     <?php echo $options; ?>
+                                </select>
+                            </div>
+                            <div class="page-service-add-service-data">
+                                <h5>Metoda Płatności</h5>
+                                <select name="macbook_payment_id" required>
+                                    <?php echo $payment_options; ?>
                                 </select>
                             </div>
                         </div>
@@ -601,7 +809,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
             }
             else if (service === 'iphone') {
                 modalContent.innerHTML += `
-                    <h2>Serwis iPhone</h2>
+                    <div class="model-content-service-head">
+                        <h3 class="modal-content-service-title">Szczegóły Zamówienia</h3>
+                    </div>
+                    <div class="model-content-service-subtitle">
+                        <img src= "/public/order_icon_black.svg" alt="service-order-icon">
+                        <h2>Serwis iPhone</h2>
+                    </div>
                     <form method="post">
                         <div class="page-service-add-service">
                             <div class="page-service-add-service-data">
@@ -617,9 +831,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                                 <textarea name="iphone_problem_description" placeholder="Opis problemu" required></textarea>
                             </div>
                             <div class="page-service-add-service-data">
+                                <h5>Wybierz usłgugę</h5>
+                                <select name="service_id_iphone" required>
+                                    <?php echo $service_iphone_options; ?>
+                                </select>
+                            </div>
+                            <div class="page-service-add-service-data">
                                 <h5>Wybierz pracownika</h5>
                                 <select name="iphone_employee_id" required>
                                     <?php echo $options; ?>
+                                </select>
+                            </div>
+                            <div class="page-service-add-service-data">
+                                <h5>Metoda Płatności</h5>
+                                <select name="iphone_payment_id" required>
+                                    <?php echo $payment_options; ?>
                                 </select>
                             </div>
                         </div>
