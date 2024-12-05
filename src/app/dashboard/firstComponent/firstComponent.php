@@ -15,6 +15,7 @@ $photo = $_SESSION['photo'] ?? null;
 $ContactId = $_SESSION['ContactId'] ?? null;
 $AddressId = $_SESSION['AddressId'] ?? null;
 $ClientId = $_SESSION['ClientId'] ?? null;
+$isAdmin = $_SESSION['isAdmin'] ?? null;
 
 if (!isset($conn)) {
     die("Błąd: brak zmiennej \$pdo. Upewnij się, że db.php jest poprawnie zaimportowany.");
@@ -66,6 +67,60 @@ $stmt = $conn->prepare($sql);
 $stmt->bindParam(':id_klienta', $ClientId, PDO::PARAM_INT);
 $stmt->execute();
 $AllOrdersFromClient = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+if($isAdmin)
+{
+    $sql = "
+        SELECT 
+           k.Id_Klienta,
+           k.Imie,
+           k.Nazwisko,
+           k.Id_Kontaktu,
+           k.Id_Adresu,
+           kon.Email,
+           kon.NumerTelefonu,
+           ad.Ulica,
+           ad.Numer_domu,
+           ad.Kod_Pocztowy,
+           ad.Miasto
+           
+        FROM klienci k
+        INNER JOIN kontakty kon ON k.Id_Kontaktu = kon.Id_Kontaktu
+        INNER JOIN adresy ad ON k.Id_Adresu = ad.Id_Adresu
+    ";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $AllUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+if($isAdmin)
+{
+    $sql = "
+        SELECT 
+           p.Id_Pracownika,
+           p.Imie,
+           p.Nazwisko,
+           p.Stanowisko,
+           p.Id_Kontaktu,
+           p.Id_Adresu,
+           k.Email,
+           k.NumerTelefonu,
+           k.NumerTelefonu,
+           a.Ulica,
+           a.Numer_domu,
+           a.Kod_Pocztowy,
+           a.Miasto
+           
+        FROM pracownicy p
+        INNER JOIN kontakty k ON p.Id_Kontaktu = k.Id_Kontaktu
+        INNER JOIN adresy a ON p.Id_Adresu = a.Id_Adresu
+
+    ";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $AllEmployees = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
 if ($AddressId) {
 
@@ -175,6 +230,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_password'])) {
         echo "Nie udalo sie zmienic hasła uzytkownika";
     }
 }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_order'])) {
+    $OrderId = $_POST['delete_order_id'] ?? null;
+    $OrderNameIdStatus = $_POST['delete_order_id_status'] ?? null;
+    $OrderNameStatus = $_POST['delete_order_name_status'] ?? null;
+
+    if($OrderNameStatus !== 'Nowe')
+    {
+        return;
+    }
+    else if ($OrderId && $OrderNameIdStatus )
+    {
+        $newStatusId = "2116961734";
+        $stmt = $conn->prepare("UPDATE zlecenia SET Id_Statusu = ? WHERE Id_Zlecenia = ?");
+        $stmt->execute([$newStatusId, $OrderId]);
+    } else
+    {
+        echo "Nie udało się zmienić statusu zamówienia na anulowane";
+    }
+}
+
 
 $section = isset($_POST['section']) ? $_POST['section'] : 'profile';
 $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
@@ -213,6 +288,12 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                             <img src="/public/order_icon.svg" alt="order-icon" class="page-dashboard-menu-icon"/>
                             <h3>Zamówienia</h3>
                         </button>
+                        <?php if ($isAdmin): ?>
+                            <button type="submit" name="section" value="admin">
+                                <img src="/public/admin-icon.svg" alt="admin-icon" class="page-dashboard-menu-icon" />
+                                <h3>Admin</h3>
+                            </button>
+                        <?php endif; ?>
                         <div class="page-dashboard-button-logout">
                             <button type="submit" name="logout">Wyloguj</button>
                         </div>
@@ -306,18 +387,76 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                         </button>
                     <?php endif; ?>
                     <?php if ($section === 'orders'): ?>
-<!--                        <h1 class="page-dashboard-orders-user-title">Lista urządzeń klienta</h1>-->
-<!--                        <div class="page-dashboard-orders-user-devices-list">-->
-<!--                            --><?php //if (!empty($AllDevicesFromClient)): ?>
-<!--                                --><?php //foreach ($AllDevicesFromClient as $device): ?>
-<!--                                    <div class="page-dashboard-orders-user-single-device">-->
-<!--                                        <h3>--><?php //echo htmlspecialchars($device['Marka'] . " " . $device['Model']); ?><!--</h3>-->
-<!--                                    </div>-->
-<!--                                --><?php //endforeach; ?>
-<!--                            --><?php //else: ?>
-<!--                                <p>Brak dodanych urządzeń przez klienta.</p>-->
-<!--                            --><?php //endif; ?>
-<!--                        </div>-->
+                        <!--                        <h1 class="page-dashboard-orders-user-title">Lista urządzeń klienta</h1>-->
+                        <!--                        <div class="page-dashboard-orders-user-devices-list">-->
+                        <!--                            --><?php //if (!empty($AllDevicesFromClient)): ?>
+                        <!--                                --><?php //foreach ($AllDevicesFromClient as $device): ?>
+                        <!--                                    <div class="page-dashboard-orders-user-single-device">-->
+                        <!--                                        <h3>--><?php //echo htmlspecialchars($device['Marka'] . " " . $device['Model']); ?><!--</h3>-->
+                        <!--                                    </div>-->
+                        <!--                                --><?php //endforeach; ?>
+                        <!--                            --><?php //else: ?>
+                        <!--                                <p>Brak dodanych urządzeń przez klienta.</p>-->
+                        <!--                            --><?php //endif; ?>
+                        <!--                        </div>-->
+                    <?php endif; ?>
+                    <?php if ($section === 'admin'): ?>
+                        <div class="page-dashboard-admin">
+                            <div class="page-dashboard-admin-users">
+                                <h3>Użytkownicy</h3>
+                                <?php if (!empty($AllUsers)): ?>
+                                    <?php foreach ($AllUsers as $users): ?>
+                                        <div class="page-dashboard-admin-single-user" type="submit" data-user="user">
+                                            <div class="page-dashboard-orders-user-single-section-title">Id: </div>
+                                            <div class="page-dashboard-admin-single-user-id" type="submit" data-user="user"><?php echo htmlspecialchars($users['Id_Klienta']); ?></div>
+                                            <div class="page-dashboard-orders-user-single-section-title">Imie i Nazwisko: </div>
+                                            <div class="page-dashboard-admin-single-user-name" ><?php echo htmlspecialchars($users['Imie'] . " " . $users['Nazwisko']); ?></div>
+                                            <input type="hidden" class="page-dashboard-admin-user-id" value="<?php echo htmlspecialchars($users['Id_Klienta']); ?>" />
+                                            <input type="hidden" class="page-dashboard-admin-user-firstname" value="<?php echo htmlspecialchars($users['Imie']); ?>" />
+                                            <input type="hidden" class="page-dashboard-admin-user-lastname" value="<?php echo htmlspecialchars($users['Nazwisko']); ?>" />
+                                            <input type="hidden" class="page-dashboard-admin-user-email" value="<?php echo htmlspecialchars($users['Email']); ?>" />
+                                            <input type="hidden" class="page-dashboard-admin-user-phone" value="<?php echo htmlspecialchars($users['NumerTelefonu']); ?>" />
+                                            <input type="hidden" class="page-dashboard-admin-user-street" value="<?php echo htmlspecialchars($users['Ulica']); ?>" />
+                                            <input type="hidden" class="page-dashboard-admin-user-house-number" value="<?php echo htmlspecialchars($users['Numer_domu']); ?>" />
+                                            <input type="hidden" class="page-dashboard-admin-user-post-code" value="<?php echo htmlspecialchars($users['Kod_Pocztowy']); ?>" />
+                                            <input type="hidden" class="page-dashboard-admin-user-city" value="<?php echo htmlspecialchars($users['Miasto']); ?>" />
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <p>Brak dodanych urządzeń przez klienta.</p>
+                                <?php endif; ?>
+                            </div>
+                            <div class="page-dashboard-admin-center-lines">
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <div class="page-dashboard-admin-employees">
+                                <h3>Pracownicy</h3>
+                                <?php if (!empty($AllEmployees)): ?>
+                                    <?php foreach ($AllEmployees as $employee): ?>
+                                        <div class="page-dashboard-admin-single-employee" type="submit" data-user="user">
+                                            <div class="page-dashboard-orders-user-single-section-title">Id: </div>
+                                            <div class="page-dashboard-admin-single-user-id"><?php echo htmlspecialchars($employee['Id_Pracownika']); ?></div>
+                                            <div class="page-dashboard-orders-user-single-section-title">Imie i Nazwisko: </div>
+                                            <div class="page-dashboard-admin-single-user-name"><?php echo htmlspecialchars($employee['Imie'] . " " . $employee['Nazwisko']); ?></div>
+                                            <input type="hidden" class="page-dashboard-admin-employee-id" value="<?php echo htmlspecialchars($employee['Id_Pracownika']); ?>" />
+                                            <input type="hidden" class="page-dashboard-admin-employee-firstname" value="<?php echo htmlspecialchars($employee['Imie']); ?>" />
+                                            <input type="hidden" class="page-dashboard-admin-employee-lastname" value="<?php echo htmlspecialchars($employee['Nazwisko']); ?>" />
+                                            <input type="hidden" class="page-dashboard-admin-employee-position" value="<?php echo htmlspecialchars($employee['Stanowisko']); ?>" />
+                                            <input type="hidden" class="page-dashboard-admin-employee-email" value="<?php echo htmlspecialchars($employee['Email']); ?>" />
+                                            <input type="hidden" class="page-dashboard-admin-employee-phone" value="<?php echo htmlspecialchars($employee['NumerTelefonu']); ?>" />
+                                            <input type="hidden" class="page-dashboard-admin-employee-street" value="<?php echo htmlspecialchars($employee['Ulica']); ?>" />
+                                            <input type="hidden" class="page-dashboard-admin-employee-house-number" value="<?php echo htmlspecialchars($employee['Numer_domu']); ?>" />
+                                            <input type="hidden" class="page-dashboard-admin-employee-post-code" value="<?php echo htmlspecialchars($employee['Kod_Pocztowy']); ?>" />
+                                            <input type="hidden" class="page-dashboard-admin-employee-city" value="<?php echo htmlspecialchars($employee['Miasto']); ?>" />
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <p>Brak dodanych urządzeń przez klienta.</p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
                     <?php endif; ?>
                 </div>
                 <div class="page-dashboard-content-bottom">
@@ -333,7 +472,39 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                                     <div class="page-dashboard-orders-user-single-data-ending"><?php echo $order['Data_Zakończenia'] === null ? "W trakcie" : htmlspecialchars($order['Data_Zakończenia']); ?></div>
                                     <div class="page-dashboard-orders-user-single-section-device"><?php echo htmlspecialchars($order['Marka'] . " " . $order['Model']); ?></div>
                                     <div class="page-dashboard-orders-user-single-show" type="submit" data-order="order" >Pokaż</div>
-                                    <div class="page-dashboard-orders-user-single-delete">Anuluj</div>
+                                    <form method="POST">
+                                        <button class="page-dashboard-orders-user-single-delete"
+                                                type="submit" name="delete_order"
+                                                style="background-color: <?php
+                                                // Change background color based on the order's status
+                                                if ($order['Nazwa_Statusu'] === 'Nowe') {
+                                                    echo "#b10404";  // Red for 'Nowe'
+                                                } elseif ($order['Nazwa_Statusu'] === 'Ukonczone') {
+                                                    echo "#222222";  // Dark for 'Ukończone'
+                                                } elseif ($order['Nazwa_Statusu'] === 'Anulowane') {
+                                                    echo "#c8c8c8";  // Light gray for 'Anulowane'
+                                                } else {
+                                                    echo "#049a52";  // Green for other statuses (Realizacja)
+                                                }
+                                                ?>">
+
+                                            <?php
+                                            // Display the status text inside the button
+                                            if ($order['Nazwa_Statusu'] === 'Nowe') {
+                                                echo "Anuluj";
+                                            } elseif ($order['Nazwa_Statusu'] === 'Ukonczone') {
+                                                echo "Zakończone";
+                                            } elseif ($order['Nazwa_Statusu'] === 'Anulowane') {
+                                                echo "Anulowane";
+                                            } else {
+                                                echo "Realizacja";
+                                            }
+                                            ?>
+                                            <input type="hidden" name="delete_order_id" value="<?php echo htmlspecialchars($order['Id_Zlecenia']); ?>" />
+                                            <input type="hidden" name="delete_order_name_status" value="<?php echo htmlspecialchars($order['Nazwa_Statusu']); ?>" />
+                                            <input type="hidden" name="delete_order_id_status" value="<?php echo htmlspecialchars($order['Id_Statusu']); ?>" />
+                                        </button>
+                                    </form>
                                     <input type="hidden" class="page-dashboard-orders-user-single-serial_number" value="<?php echo htmlspecialchars($order['Numer_Seryjny']); ?>"/>
                                     <input type="hidden" class="page-dashboard-orders-user-single-issue_desc" value="<?php echo htmlspecialchars($order['Opis_Problemu']); ?>"/>
                                     <input type="hidden" class="page-dashboard-orders-user-single-status" value="<?php echo htmlspecialchars($order['Nazwa_Statusu']); ?>"/>
@@ -357,20 +528,20 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
             <div class="modal-content">
                 <button id="close-modal" class="close-modal">&times;</button>
                 <?php if ($section === 'profile'): ?>
-                <h2>Edycja Profilu</h2>
-                <form method="post">
-                    <div class="page-dashboard-edit-profile-container">
-                        <div class="page-dashboard-edit-profile-container-data">
-                            <h5>Imie</h5>
-                            <input type="text" name="firstname" placeholder="Firstname" value="<?php echo ($firstname); ?>" required>
+                    <h2>Edycja Profilu</h2>
+                    <form method="post">
+                        <div class="page-dashboard-edit-profile-container">
+                            <div class="page-dashboard-edit-profile-container-data">
+                                <h5>Imie</h5>
+                                <input type="text" name="firstname" placeholder="Firstname" value="<?php echo ($firstname); ?>" required>
+                            </div>
+                            <div class="page-dashboard-edit-profile-container-data">
+                                <h5>Nazwisko</h5>
+                                <input type="text" name="lastname" placeholder="Lastname" value="<?php echo ($lastname); ?>" required>
+                            </div>
                         </div>
-                        <div class="page-dashboard-edit-profile-container-data">
-                            <h5>Nazwisko</h5>
-                            <input type="text" name="lastname" placeholder="Lastname" value="<?php echo ($lastname); ?>" required>
-                        </div>
-                    </div>
-                    <button type="submit" name="update_profile" class="page-dashboard-edit-profile-container-button">Zapisz zmiany</button>
-                </form>
+                        <button type="submit" name="update_profile" class="page-dashboard-edit-profile-container-button">Zapisz zmiany</button>
+                    </form>
                 <?php endif; ?>
                 <?php if ($section === 'password'): ?>
                     <h2>Edycja Hasła</h2>
@@ -438,6 +609,18 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                 <?php endif; ?>
             </div>
         </div>
+        <div id="modal-user" class="modal-user">
+            <div class="modal-content-user">
+                <button id="close-modal-user" class="close-modal-user">&times;</button>
+            </div>
+        </div>
+
+        <div id="modal-employee" class="modal-employee">
+            <div class="modal-content-employee">
+                <button id="close-modal-employee" class="close-modal-employee">&times;</button>
+            </div>
+        </div>
+
         <div id="modal-order" class="modal-order">
             <div class="modal-content-order">
                 <button id="close-modal-order" class="close-modal-order">&times;</button>
@@ -540,7 +723,7 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                         <div>${orderDateCompletion}</div>
                     </div>
                     <div class="modal-order-detail">
-                        <p>Serwisant</p>
+                        <p>Serwisant:</p>
                         <div>${orderEmployeeName} ${orderEmployeeSurname}</div>
                     </div>
                     <div class="modal-order-detail">
@@ -568,3 +751,180 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
     });
 </script>
 
+<!-- Uzytkownik-->
+
+<script>
+    const modalUser = document.getElementById('modal-user');
+    const buttonsUser = document.querySelectorAll('.page-dashboard-admin-single-user');
+    const closeModalUserButton = document.getElementById('close-modal-user');
+
+    function closeModalUser() {
+        modalUser.style.display = 'none';
+    }
+
+    buttonsUser.forEach((button) => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+
+            const orderRow = button.closest('.page-dashboard-admin-single-user');
+            const UserId = orderRow.querySelector('.page-dashboard-admin-user-id').value;
+            const UserFirstname = orderRow.querySelector('.page-dashboard-admin-user-firstname').value;
+            const UserLastname = orderRow.querySelector('.page-dashboard-admin-user-lastname').value;
+            const UserEmail = orderRow.querySelector('.page-dashboard-admin-user-email').value;
+            const UserPhone = orderRow.querySelector('.page-dashboard-admin-user-phone').value;
+            const UserStreet = orderRow.querySelector('.page-dashboard-admin-user-street').value;
+            const UserHouseNumber = orderRow.querySelector('.page-dashboard-admin-user-house-number').value;
+            const UserPostCode = orderRow.querySelector('.page-dashboard-admin-user-post-code').value;
+            const UserCity = orderRow.querySelector('.page-dashboard-admin-user-city').value;
+
+            const modalContent = modalUser.querySelector('.modal-content-user');
+            modalContent.innerHTML = `
+                <button id="close-modal-user" class="close-modal-user">&times;</button>
+                <div class="model-content-user-head">
+                    <h3 class="modal-content-user-title">Dane Użytkownika</h3>
+                </div>
+                <div class="modal-user-details">
+                    <div class="modal-user-detail">
+                        <p>ID:</p>
+                        <div>${UserId}</div>
+                    </div>
+                    <div class="modal-user-detail">
+                        <p>Imie:</p>
+                        <div>${UserFirstname}</div>
+                    </div>
+                    <div class="modal-user-detail">
+                        <p>Nazwisko:</p>
+                        <div>${UserLastname}</div>
+                    </div>
+                    <div class="modal-user-detail">
+                        <p>Email:</p>
+                        <div>${UserEmail}</div>
+                    </div>
+                    <div class="modal-user-detail">
+                        <p>Telefon:</p>
+                        <div>${UserPhone}</div>
+                    </div>
+                    <div class="modal-user-detail">
+                        <p>Miasto:</p>
+                        <div>${UserCity}</div>
+                    </div>
+                    <div class="modal-user-detail">
+                        <p>Kod Pocztowy:</p>
+                        <div>${UserPostCode}</div>
+                    </div>
+                    <div class="modal-user-detail">
+                        <p>Ulica:</p>
+                        <div>${UserStreet}</div>
+                    </div>
+                    <div class="modal-user-detail">
+                        <p>Numer Domu:</p>
+                        <div>${UserHouseNumber}</div>
+                    </div>
+                </div>
+            `;
+
+            const closeButton = modalContent.querySelector('.close-modal-user');
+            closeButton.addEventListener('click', closeModalUser);
+
+            modalUser.style.display = 'flex';
+        });
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target === modalUser) {
+            closeModalUser();
+        }
+    });
+</script>
+
+<!-- Pracownicy-->
+
+<script>
+    const modalEmployee = document.getElementById('modal-employee');
+    const buttonsEmployee = document.querySelectorAll('.page-dashboard-admin-single-employee');
+    const closeModalEmployeeButton = document.getElementById('close-modal-employee');
+
+    function closeModalEmployee() {
+        modalEmployee.style.display = 'none';
+    }
+
+    buttonsEmployee.forEach((button) => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+
+            const orderRow = button.closest('.page-dashboard-admin-single-employee');
+            const EmployeeId = orderRow.querySelector('.page-dashboard-admin-employee-id').value;
+            const EmployeeFirstname = orderRow.querySelector('.page-dashboard-admin-employee-firstname').value;
+            const EmployeeLastname = orderRow.querySelector('.page-dashboard-admin-employee-lastname').value;
+            const EmployeePositon = orderRow.querySelector('.page-dashboard-admin-employee-position').value;
+            const EmployeeEmail = orderRow.querySelector('.page-dashboard-admin-employee-email').value;
+            const EmployeePhone = orderRow.querySelector('.page-dashboard-admin-employee-phone').value;
+            const EmployeeStreet = orderRow.querySelector('.page-dashboard-admin-employee-street').value;
+            const EmployeeHouseNumber = orderRow.querySelector('.page-dashboard-admin-employee-house-number').value;
+            const EmployeePostCode = orderRow.querySelector('.page-dashboard-admin-employee-post-code').value;
+            const EmployeeCity = orderRow.querySelector('.page-dashboard-admin-employee-city').value;
+
+
+            const modalContent = modalEmployee.querySelector('.modal-content-employee');
+            modalContent.innerHTML = `
+                <button id="close-modal-employee" class="close-modal-employee">&times;</button>
+                <div class="model-content-employee-head">
+                    <h3 class="modal-content-employee-title">Dane Pracownika</h3>
+                </div>
+                <div class="modal-employee-details">
+                    <div class="modal-employee-detail">
+                        <p>ID:</p>
+                        <div>${EmployeeId}</div>
+                    </div>
+                    <div class="modal-employee-detail">
+                        <p>Imie:</p>
+                        <div>${EmployeeFirstname}</div>
+                    </div>
+                    <div class="modal-employee-detail">
+                        <p>Nazwisko:</p>
+                        <div>${EmployeeLastname}</div>
+                    </div>
+                    <div class="modal-employee-detail">
+                        <p>Stanowisko:</p>
+                        <div>${EmployeePositon}</div>
+                    </div>
+                    <div class="modal-employee-detail">
+                        <p>Email:</p>
+                        <div>${EmployeeEmail}</div>
+                    </div>
+                    <div class="modal-employee-detail">
+                        <p>Numer Telefonu:</p>
+                        <div>${EmployeePhone}</div>
+                    </div>
+                    <div class="modal-employee-detail">
+                        <p>Miasto:</p>
+                        <div>${EmployeeCity}</div>
+                    </div>
+                    <div class="modal-employee-detail">
+                        <p>Kod Pocztowy:</p>
+                        <div>${EmployeePostCode}</div>
+                    </div>
+                    <div class="modal-employee-detail">
+                        <p>Ulica:</p>
+                        <div>${EmployeeStreet}</div>
+                    </div>
+                    <div class="modal-employee-detail">
+                        <p>Numer Domu:</p>
+                        <div>${EmployeeHouseNumber}</div>
+                    </div>
+                </div>
+            `;
+
+            const closeButton = modalContent.querySelector('.close-modal-employee');
+            closeButton.addEventListener('click', closeModalEmployee);
+
+            modalEmployee.style.display = 'flex';
+        });
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target === modalUser) {
+            closeModalEmployee();
+        }
+    });
+</script>

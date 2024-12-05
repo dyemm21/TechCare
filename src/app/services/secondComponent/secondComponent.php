@@ -486,7 +486,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                 </div>
                 <h3 class="page-services-second-title">Smartphone Repair</h3>
                 <p class="page-services-second-description">Ideas it would brought city, been a concise upper office propitiously necessary though</p>
-                <a href="#" class="page-services-second-read-more">Read More</a>
+                <a href="#" class="page-services-second-read-more">Purchase</a>
             </div>
             <div type="submit" class="page-services-second-card" data-service="laptop">
                 <img src="../../../../public/laptop-repair.jpg" alt="Smartphone Repair" class="page-services-second-image">
@@ -495,7 +495,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                 </div>
                 <h3 class="page-services-second-title">Laptop Repair</h3>
                 <p class="page-services-second-description">Ideas it would brought city, been a concise upper office propitiously necessary though</p>
-                <a href="#" class="page-services-second-read-more">Read More</a>
+                <a href="#" class="page-services-second-read-more">Purchase</a>
             </div>
             <div type="submit" class="page-services-second-card" data-service="tablet">
                 <img src="../../../../public/camera_fix.jpg" alt="Camera Repair" class="page-services-second-image">
@@ -504,7 +504,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                 </div>
                 <h3 class="page-services-second-title">Tablet Repair</h3>
                 <p class="page-services-second-description">Chooses by not must structure to him all findings. Sitting into the and we he everyday</p>
-                <a href="#" class="page-services-second-read-more">Read More</a>
+                <a href="#" class="page-services-second-read-more">Purchase</a>
             </div>
         </form>
         <form method="post" class="page-services-second-grid">
@@ -515,7 +515,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                 </div>
                 <h3 class="page-services-second-title">iPhone Repair</h3>
                 <p class="page-services-second-description">Chooses by not must structure to him all findings. Sitting into the and we he everyday</p>
-                <a href="#" class="page-services-second-read-more">Read More</a>
+                <a href="#" class="page-services-second-read-more">Purchase</a>
             </div>
             <div type="submit" class="page-services-second-card" data-service="macbook">
                 <img src="../../../../public/macbook_fix.jpg" alt="Desktop Repair" class="page-services-second-image">
@@ -524,7 +524,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                 </div>
                 <h3 class="page-services-second-title">Macbook Repair</h3>
                 <p class="page-services-second-description">Set power royal this boss it and of take all that, space hands and of the found in week</p>
-                <a href="#" class="page-services-second-read-more">Read More</a>
+                <a href="#" class="page-services-second-read-more">Purchase</a>
             </div>
             <div type="submit" class="page-services-second-card" data-service="ipad">
                 <img src="../../../../public/dektop_fix.jpg" alt="Desktop Repair" class="page-services-second-image">
@@ -533,7 +533,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                 </div>
                 <h3 class="page-services-second-title">iPad Repair</h3>
                 <p class="page-services-second-description">Set power royal this boss it and of take all that, space hands and of the found in week</p>
-                <a href="#" class="page-services-second-read-more">Read More</a>
+                <a href="#" class="page-services-second-read-more">Purchase</a>
             </div>
         </form>
         <div id="modal-service" class="modal-service">
@@ -657,7 +657,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" name="add-service-ipad" class="page-service-add-service-data-button">Zapisz zmiany</button>
+                        <button type="submit" name="add-service-ipad" class="page-service-add-service-data-button">Złóż zamówienie</button>
                     </form>
                 `;
             }
@@ -707,7 +707,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" name="add-service-tablet" class="page-service-add-service-data-button">Zapisz zmiany</button>
+                        <button type="submit" name="add-service-tablet" class="page-service-add-service-data-button">Złóż zamówienie</button>
                     </form>
                 `;
             }
@@ -757,7 +757,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" name="add-service-laptop" class="page-service-add-service-data-button">Zapisz zmiany</button>
+                        <button type="submit" name="add-service-laptop" class="page-service-add-service-data-button">Złóż zamówienie</button>
                     </form>
                 `;
             }
@@ -803,7 +803,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" name="add-service-macbook" class="page-service-add-service-data-button">Zapisz zmiany</button>
+                        <button type="submit" name="add-service-macbook" class="page-service-add-service-data-button">Złóż zamówienie</button>
                     </form>
                 `;
             }
@@ -849,7 +849,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" name="add-service-iphone" class="page-service-add-service-data-button">Zapisz zmiany</button>
+                        <button type="submit" name="add-service-iphone" class="page-service-add-service-data-button">Złóż zamówienie</button>
                     </form>
                 `;
             }
