@@ -791,6 +791,128 @@
     height: 100%;
     background-color: #cfcfcf;
 }
+
+.modal-admin-order{
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(3px);
+    z-index: 10;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content-admin-order {
+    background-color: white;
+    min-width: 800px;
+    height: auto;
+    border-radius: 10px;
+    /*padding: 20px 30px 30px 30px;*/
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.close-modal-admin-order {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 40px;
+    cursor: pointer;
+    color: #555;
+}
+.modal-admin-order-details-title
+{
+    font-size: 26px;
+}
+.modal-admin-order-details
+{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 16px;
+    padding: 0 20px 20px 20px;
+}
+.modal-admin-order-detail p{
+    font-weight: 600;
+}
+.modal-admin-order-detail div{
+    color: #0652dd;
+}
+.modal-admin-order-detail
+{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: solid 2px #cfcfcf;
+}
+.modal-admin-order-detail img{
+    margin-left: 10px;
+    cursor: pointer;
+}
+.model-content-admin-order-head
+{
+    width: 100%;
+    background-color: #f0f7f4;
+    height: 70px;
+    padding: 20px;
+    border-bottom: 2px solid #dee8e5;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.modal-content-admin-order-title
+{
+    font-size: 18px;
+    cursor: pointer;
+    color: #404040;
+}
+.page-dashboard-orders-user-single-show-admin{
+    padding: 10px 15px;
+    background-color: #0056d2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    margin-right: 15px;
+    font-size: 12px;
+    cursor: pointer;
+}
+.page-dashboard-orders-user-single-order-admin
+{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    /*uwaga*/
+    font-size: 18px;
+    padding-left: 5px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #cfcfcf;
+}
+.page-dashboard-orders-user-single-id-admin
+{
+    width: 130px;
+}
+.page-dashboard-orders-user-single-date-reception-admin
+{
+    width: 130px;
+}
+.page-dashboard-orders-user-single-data-ending-admin
+{
+    width: 130px;
+}
+.page-dashboard-orders-user-single-section-device-admin
+{
+    color: #0652dd;
+    min-width: 260px;
+}
 @media(max-width: 1536px)
 {
     .page-dashboard-first-container{

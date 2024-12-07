@@ -3,27 +3,37 @@
     /*border-radius: 20px;*/
     /*padding: 50px 0;*/
     /*margin-bottom: 50px;*/
+    background: linear-gradient(to bottom, #ffffff, #f8f8f8);
+    /*border-radius: 10px;*/
 }
 .page-contact-first-container{
     width: 1536px;
-    padding: 90px 50px 90px 50px;
+    padding: 45px 50px 90px 50px;
     margin: auto;
     display: flex;
-    justify-content: center;
+    gap: 80px;
     align-items: center;
     min-height: calc(100vh - 120px);
-    /*background-color: #555555;*/
 }
-
+.google-map-container {
+    /*display: flex;*/
+    /*justify-content: center;*/
+}
+.google-map-container iframe{
+    border-radius: 20px;
+    border: 2px solid #4487fa;
+}
 .page-contact-first-grid {
     display: flex;
-    gap: 100px;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
 }
 .page-contact-first-card {
     /*background-color: yellow;*/
     padding: 40px 10px;
     height: 300px;
-    width: 30%;
+    /*width: 30%;*/
     transition: transform 0.3s ease;
     cursor: pointer;
     display: flex;
@@ -38,8 +48,8 @@
 }
 
 .page-contact-first-icon {
-    width: 70px;
-    height: 70px;
+    width: 60px;
+    height: 60px;
     background-color: #1063ff;
     border-radius: 50%;
     display: flex;
