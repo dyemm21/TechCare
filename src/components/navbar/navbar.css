@@ -3,6 +3,7 @@
     border: none;
     border-radius: 10px;
     padding: 10px 0 14px 0;
+    z-index: 2;
     /*background-color: #fcfcfc;*/
 }
 .navbar-container{
@@ -32,7 +33,11 @@
     gap: 35px;
     align-items: center;
     cursor: pointer;
-    font-size: 20px;
+    font-size: 18px;
+}
+.links a{
+    /*color: #0056d2;*/
+    /*text-decoration: underline;*/
 }
 .button{
     min-width: 100px;

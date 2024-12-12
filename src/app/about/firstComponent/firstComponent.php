@@ -6,7 +6,11 @@
                 <p>Learn more about who we are and what we do to make a difference. We provide innovative solutions to enhance efficiency and support local businesses.</p>
                 <div class="page-about-buttons">
                     <button>Learn more</button>
-                    <button>Contact Us</button>
+                    <button>
+                        <a href="?page=contact">
+                            Contact Us
+                        </a>
+                    </button>
                 </div>
             </div>
         </div>

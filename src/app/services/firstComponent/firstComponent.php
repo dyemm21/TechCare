@@ -6,7 +6,11 @@
                 <p>Professional technical support available around the world. No matter the issue, we're ready to help whenever you need us.</p>
                 <div class="page-services-first-buttons">
                     <button>View Services</button>
-                    <button>Contact Us</button>
+                    <button>
+                        <a href="?page=contact">
+                            Contact Us
+                        </a>
+                    </button>
                 </div>
             </div>
         </div>

@@ -13,7 +13,7 @@
                     </div>
                     <h3 class="service-title">Smartphone Repair</h3>
                     <p class="service-description">Ideas it would brought city, been a concise upper office propitiously necessary though</p>
-                    <a href="#" class="read-more">Purchase</a>
+                    <a href="?page=services" class="read-more">See More</a>
                 </div>
 
                 <div class="service-card">
@@ -23,7 +23,7 @@
                     </div>
                     <h3 class="service-title">Desktop Repair</h3>
                     <p class="service-description">Set power royal this boss it and of take all that, space hands and of the found in week</p>
-                    <a href="#" class="read-more">Purchase</a>
+                    <a href="?page=services" class="read-more">See More</a>
                 </div>
 
                 <div class="service-card">
@@ -33,7 +33,7 @@
                     </div>
                     <h3 class="service-title">Tablet Repair</h3>
                     <p class="service-description">Chooses by not must structure to him all findings. Sitting into the and we he everyday</p>
-                    <a href="#" class="read-more">Purchase</a>
+                    <a href="?page=services" class="read-more">See More</a>
                 </div>
             </div>
         </div>

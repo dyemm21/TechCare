@@ -17,6 +17,11 @@ $AddressId = $_SESSION['AddressId'] ?? null;
 $ClientId = $_SESSION['ClientId'] ?? null;
 $isAdmin = $_SESSION['isAdmin'] ?? null;
 
+$section = isset($_POST['section']) ? $_POST['section'] : 'profile';
+$edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
+
+$CurrentUser = '';
+
 if (!isset($conn)) {
     die("Błąd: brak zmiennej \$pdo. Upewnij się, że db.php jest poprawnie zaimportowany.");
 }
@@ -33,7 +38,7 @@ $sql = "
         z.Id_Urządzenia,
         z.Id_Pracownika,
         z.Data_Przyjęcia,
-        z.Opis_Problemu,
+        z.Opis_Problemu AS Opis_Naprawy,
         z.Id_Statusu,
         s.Nazwa AS Nazwa_Statusu,
         z.Data_Zakończenia,
@@ -42,6 +47,7 @@ $sql = "
         u.Id_TypuUrządzenia,
         u.Marka,
         u.Model,
+        u.Opis_problemu AS Opis_Problemu,
         u.Numer_Seryjny,
         p.Imie AS Imie_Pracownika,
         p.Nazwisko AS Nazwisko_Pracownika,
@@ -68,50 +74,88 @@ $stmt->bindParam(':id_klienta', $ClientId, PDO::PARAM_INT);
 $stmt->execute();
 $AllOrdersFromClient = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-if($isAdmin)
-{
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['currentUserId'])) {
+    $CurrentUser = (int)$_POST['currentUserId'];
+} else {
+    $CurrentUser = null;
+}
+
+if ($isAdmin) {
     $sql = "
-    SELECT 
-        z.Id_Zlecenia,
-        z.Id_Urządzenia,
-        z.Id_Pracownika,
-        z.Data_Przyjęcia,
-        z.Opis_Problemu,
-        z.Id_Statusu,
-        s.Nazwa AS Nazwa_Statusu,
-        z.Data_Zakończenia,
-        z.Id_Usługi,
-        u.Id_Klienta,
-        u.Id_TypuUrządzenia,
-        u.Marka,
-        u.Model,
-        u.Numer_Seryjny,
-        p.Imie AS Imie_Pracownika,
-        p.Nazwisko AS Nazwisko_Pracownika,
-        p.Stanowisko AS Stanowisko_Pracownika,
-        z.Id_Płatności,
-        x.Nazwa_Płatności,
-        tu.Nazwa AS Nazwa_TypuUrządzenia,
-        serv.Nazwa AS Nazwa_Usługi,
-        serv.Opis AS Opis_Usługi,
-        serv.Cena AS Cena_Usługi,
-        k.Imie AS Imie_Uzytkownika,
-        k.Nazwisko AS Nazwisko_Uzytkownika
-    
-    FROM zlecenia z
-    INNER JOIN urządzenia u ON z.Id_Urządzenia = u.Id_Urządzenia
-    INNER JOIN klienci k ON u.Id_Klienta = k.Id_Klienta
-    INNER JOIN typurządzenia tu ON u.Id_TypuUrządzenia = tu.Id_TypuUrządzenia
-    INNER JOIN usługi serv ON z.Id_Usługi = serv.Id_Usługi
-    INNER JOIN status s ON z.Id_Statusu = s.Id_Statusu
-    INNER JOIN pracownicy p ON z.Id_Pracownika = p.Id_Pracownika
-    INNER JOIN płatność x ON z.Id_Płatności = x.Id_Płatności
-    ORDER BY z.Data_Przyjęcia DESC;
-";
+        SELECT 
+            z.Id_Zlecenia,
+            z.Id_Urządzenia,
+            z.Id_Pracownika,
+            z.Data_Przyjęcia, 
+            z.Opis_Problemu AS Opis_Naprawy,
+            z.Id_Statusu,
+            s.Nazwa AS Nazwa_Statusu, 
+            z.Data_Zakończenia,
+            z.Id_Usługi,
+            u.Id_Klienta,
+            u.Id_TypuUrządzenia,
+            u.Marka,
+            u.Model,
+            u.Numer_Seryjny,
+            u.Opis_problemu AS Opis_Problemu, 
+            p.Imie AS Imie_Pracownika,
+            p.Nazwisko AS Nazwisko_Pracownika, 
+            p.Stanowisko AS Stanowisko_Pracownika,
+            z.Id_Płatności, 
+            x.Nazwa_Płatności,
+            tu.Nazwa AS Nazwa_TypuUrządzenia, 
+            serv.Nazwa AS Nazwa_Usługi,
+            serv.Opis AS Opis_Usługi, 
+            serv.Cena AS Cena_Usługi,
+            k.Imie AS Imie_Uzytkownika, 
+            k.Nazwisko AS Nazwisko_Uzytkownika 
+        
+        FROM zlecenia z 
+        INNER JOIN urządzenia u ON z.Id_Urządzenia = u.Id_Urządzenia 
+        INNER JOIN klienci k ON u.Id_Klienta = k.Id_Klienta 
+        INNER JOIN typurządzenia tu ON u.Id_TypuUrządzenia = tu.Id_TypuUrządzenia 
+        INNER JOIN usługi serv ON z.Id_Usługi = serv.Id_Usługi 
+        INNER JOIN status s ON z.Id_Statusu = s.Id_Statusu 
+        INNER JOIN pracownicy p ON z.Id_Pracownika = p.Id_Pracownika 
+        INNER JOIN płatność x ON z.Id_Płatności = x.Id_Płatności";
+
+    if (!empty($CurrentUser))
+    {
+        if($section === 'clientOrder')
+        {
+            $sql .= " WHERE u.Id_Klienta = :currentUser";
+        }
+        else if($section === 'employeeOrder')
+        {
+            $sql .= " WHERE z.Id_Pracownika = :currentUser";
+        }
+    }
+
+    $sql .= " ORDER BY z.Data_Przyjęcia DESC";
+
     $stmt = $conn->prepare($sql);
+
+    if (!empty($CurrentUser))
+    {
+        $stmt->bindParam(':currentUser', $CurrentUser, PDO::PARAM_INT);
+    }
+
     $stmt->execute();
     $AllOrders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
+//if($isAdmin)
+//{
+//    $sql = "SELECT Id_Statusu,Nazwa FROM status";
+//    $result = $conn->query($sql);
+//
+//    $status = '';
+//    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+//        $status .= "<option value='" . htmlspecialchars($row['Id_Statusu']) . "'>" .
+//            htmlspecialchars($row['Nazwa']) . "</option>";
+//    }
+//}
+
 
 
 if($isAdmin)
@@ -295,9 +339,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_order'])) {
     }
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
+    $newStatusId = $_POST['edit-order-status-id'] ?? null;
+    $newEmployeeId = $_POST['edit-order-employee-id'] ?? null;
+    $newServiceId = $_POST['edit-order-service-id'] ?? null;
+    $newDateCompletion = $_POST['edit-order-completion-date'] ?? null;
+    $newOrderId= $_POST['edit-order-id'] ?? null;
+    $newOrderFixDesc= $_POST['edit-order-fix-description'] ?? null;
 
-$section = isset($_POST['section']) ? $_POST['section'] : 'profile';
-$edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
+    if ($newStatusId && $newDateCompletion && $newOrderId) {
+        $stmt = $conn->prepare("UPDATE zlecenia SET Id_Statusu = ?, Data_Zakończenia = ?, Opis_Problemu = ?, Id_Pracownika = ?, Id_Usługi = ? WHERE Id_Zlecenia  = ?");
+        $stmt->execute([$newStatusId, $newDateCompletion, $newOrderFixDesc, $newEmployeeId, $newServiceId, $newOrderId]);
+
+    } else {
+        echo "Nie udalo sie zmienic zamowienia";
+    }
+}
+
+
+
+
 
 ?>
 
@@ -451,17 +512,24 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                         <!--                            --><?php //endif; ?>
                         <!--                        </div>-->
                     <?php endif; ?>
-                    <?php if ($section === 'admin'): ?>
+                    <?php if ($section === 'admin' || $section === 'clientOrder' || $section === 'employeeOrder'): ?>
                         <div class="page-dashboard-admin">
                             <div class="page-dashboard-admin-users">
                                 <h3>Użytkownicy</h3>
                                 <?php if (!empty($AllUsers)): ?>
                                     <?php foreach ($AllUsers as $users): ?>
-                                        <div class="page-dashboard-admin-single-user" type="submit" data-user="user">
-                                            <div class="page-dashboard-orders-user-single-section-title">Id: </div>
-                                            <div class="page-dashboard-admin-single-user-id" type="submit" data-user="user"><?php echo htmlspecialchars($users['Id_Klienta']); ?></div>
+                                        <div class="page-dashboard-admin-single-user">
+<!--                                            <div class="page-dashboard-orders-user-single-section-title">Id: </div>-->
+<!--                                            <div class="page-dashboard-admin-single-user-id" type="submit" data-user="user">--><?php //echo htmlspecialchars($users['Id_Klienta']); ?><!--</div>-->
                                             <div class="page-dashboard-orders-user-single-section-title">Imie i Nazwisko: </div>
                                             <div class="page-dashboard-admin-single-user-name" ><?php echo htmlspecialchars($users['Imie'] . " " . $users['Nazwisko']); ?></div>
+                                            <div class="page-dashboard-orders-user-single-show-admin-profile" type="submit" data-user="user" >Profil</div>
+                                            <form method="post">
+                                                <input type="hidden" name="currentUserId" value="<?php echo htmlspecialchars($users['Id_Klienta']); ?>" />
+                                                <button type="submit" name="section" value="clientOrder" class="page-dashboard-orders-user-single-show-orders">
+                                                    Zamówienia
+                                                </button>
+                                            </form>
                                             <input type="hidden" class="page-dashboard-admin-user-id" value="<?php echo htmlspecialchars($users['Id_Klienta']); ?>" />
                                             <input type="hidden" class="page-dashboard-admin-user-firstname" value="<?php echo htmlspecialchars($users['Imie']); ?>" />
                                             <input type="hidden" class="page-dashboard-admin-user-lastname" value="<?php echo htmlspecialchars($users['Nazwisko']); ?>" />
@@ -485,11 +553,19 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                                 <h3>Pracownicy</h3>
                                 <?php if (!empty($AllEmployees)): ?>
                                     <?php foreach ($AllEmployees as $employee): ?>
-                                        <div class="page-dashboard-admin-single-employee" type="submit" data-user="user">
-                                            <div class="page-dashboard-orders-user-single-section-title">Id: </div>
-                                            <div class="page-dashboard-admin-single-user-id"><?php echo htmlspecialchars($employee['Id_Pracownika']); ?></div>
+                                        <div class="page-dashboard-admin-single-employee" >
+<!--                                            <div class="page-dashboard-orders-user-single-section-title">Id: </div>-->
+<!--                                            <div class="page-dashboard-admin-single-user-id">--><?php //echo htmlspecialchars($employee['Id_Pracownika']); ?><!--</div>-->
                                             <div class="page-dashboard-orders-user-single-section-title">Imie i Nazwisko: </div>
                                             <div class="page-dashboard-admin-single-user-name"><?php echo htmlspecialchars($employee['Imie'] . " " . $employee['Nazwisko']); ?></div>
+                                            <div class="page-dashboard-orders-user-single-show-admin-profile" type="submit" data-user="user">Profil</div>
+                                            <form method="post">
+                                                <input type="hidden" name="currentUserId" value="<?php echo htmlspecialchars($employee['Id_Pracownika']); ?>" />
+                                                <button type="submit" name="section" value="employeeOrder" class="page-dashboard-orders-user-single-show-orders">
+                                                    Zamówienia
+                                                </button>
+                                            </form>
+
                                             <input type="hidden" class="page-dashboard-admin-employee-id" value="<?php echo htmlspecialchars($employee['Id_Pracownika']); ?>" />
                                             <input type="hidden" class="page-dashboard-admin-employee-firstname" value="<?php echo htmlspecialchars($employee['Imie']); ?>" />
                                             <input type="hidden" class="page-dashboard-admin-employee-lastname" value="<?php echo htmlspecialchars($employee['Nazwisko']); ?>" />
@@ -512,7 +588,16 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                 </div>
                 <div class="page-dashboard-content-bottom">
                     <div class="page-dashboard-content-bottom-details">
-                        <?php if ($section === 'admin'): ?>
+<!--                        --><?php //if ($section === 'clientOrder'): ?>
+<!--                            --><?php //if (!empty($AllOrders)): ?>
+<!--                                --><?php //foreach ($AllOrders as $order): ?>
+<!--                                    <div>Uzytkownik: --><?php //echo htmlspecialchars($CurrentUser); ?><!--</div>-->
+<!--                                --><?php //endforeach; ?>
+<!--                            --><?php //else: ?>
+<!--                                <p>Brak dodanych urządzeń przez klienta.</p>-->
+<!--                            --><?php //endif; ?>
+<!--                        --><?php //endif; ?>
+                        <?php if ($section === 'admin' || $section === 'clientOrder' || $section === 'employeeOrder'): ?>
                             <?php if (!empty($AllOrders)): ?>
                                 <?php foreach ($AllOrders as $order): ?>
                                     <div class="page-dashboard-orders-user-single-order-admin">
@@ -569,6 +654,7 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                                                 <input type="hidden" name="delete_order_id" value="<?php echo htmlspecialchars($order['Id_Zlecenia']); ?>" />
                                                 <input type="hidden" name="delete_order_name_status" value="<?php echo htmlspecialchars($order['Nazwa_Statusu']); ?>" />
                                                 <input type="hidden" name="delete_order_id_status" value="<?php echo htmlspecialchars($order['Id_Statusu']); ?>" />
+                                                <input type="hidden" name="page-dashboard-admin-orders-device-type-id" value="<?php echo htmlspecialchars($order['Id_TypuUrządzenia']); ?>" />
                                             </button>
                                         </form>
                                         <input type="hidden" class="page-dashboard-admin-orders-firstname" value="<?php echo htmlspecialchars($order['Imie_Uzytkownika']); ?>"/>
@@ -584,6 +670,11 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                                         <input type="hidden" class="page-dashboard-admin-orders-service-name" value="<?php echo htmlspecialchars($order['Nazwa_Usługi']); ?>"/>
                                         <input type="hidden" class="page-dashboard-admin-orders-service-price" value="<?php echo htmlspecialchars($order['Cena_Usługi']); ?>"/>
                                         <input type="hidden" class="page-dashboard-admin-orders-service-desc" value="<?php echo htmlspecialchars($order['Opis_Usługi']); ?>"/>
+                                        <input type="hidden" class="page-dashboard-admin-orders-service-status-id" value="<?php echo htmlspecialchars($order['Id_Statusu']); ?>"/>
+                                        <input type="hidden" class="page-dashboard-admin-orders-service-fix-desc" value="<?php echo htmlspecialchars($order['Opis_Naprawy']); ?>"/>
+                                        <input type="hidden" class="page-dashboard-admin-orders-service-employee-id" value="<?php echo htmlspecialchars($order['Id_Pracownika']); ?>"/>
+                                        <input type="hidden" class="page-dashboard-admin-orders-service-id" value="<?php echo htmlspecialchars($order['Id_Usługi']); ?>"/>
+                                        <input type="hidden" class="page-dashboard-admin-orders-device-type-id" value="<?php echo htmlspecialchars($order['Id_TypuUrządzenia']); ?>"/>
 
                                     </div>
                                 <?php endforeach; ?>
@@ -591,7 +682,7 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                                 <p>Brak dodanych urządzeń przez klienta.</p>
                             <?php endif; ?>
                         <?php endif; ?>
-                        <?php if ($section !== 'admin'): ?>
+                        <?php if ($section !== 'admin' && $section !== 'clientOrder' && $section !== 'employeeOrder' ): ?>
                             <?php if (!empty($AllOrdersFromClient)): ?>
                                 <?php foreach ($AllOrdersFromClient as $order): ?>
                                     <div class="page-dashboard-orders-user-single-order">
@@ -660,6 +751,8 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                                         <input type="hidden" class="page-dashboard-orders-user-single-service-name" value="<?php echo htmlspecialchars($order['Nazwa_Usługi']); ?>"/>
                                         <input type="hidden" class="page-dashboard-orders-user-single-service-price" value="<?php echo htmlspecialchars($order['Cena_Usługi']); ?>"/>
                                         <input type="hidden" class="page-dashboard-orders-user-single-service-desc" value="<?php echo htmlspecialchars($order['Opis_Usługi']); ?>"/>
+                                        <input type="hidden" class="page-dashboard-orders-user-single-service-fix-desc" value="<?php echo htmlspecialchars($order['Opis_Naprawy']); ?>"/>
+
                                     </div>
                                 <?php endforeach; ?>
                             <?php else: ?>
@@ -674,8 +767,10 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
             <div class="modal-content">
                 <button id="close-modal" class="close-modal">&times;</button>
                 <?php if ($section === 'profile'): ?>
-                    <h2>Edycja Profilu</h2>
-                    <form method="post">
+                    <div class="model-content-user-head-edit">
+                        <h3 class="modal-content-user-title">Edycja Profilu</h3>
+                    </div>
+                    <form method="post" class="modal-content-edit-user">
                         <div class="page-dashboard-edit-profile-container">
                             <div class="page-dashboard-edit-profile-container-data">
                                 <h5>Imie</h5>
@@ -690,8 +785,10 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                     </form>
                 <?php endif; ?>
                 <?php if ($section === 'password'): ?>
-                    <h2>Edycja Hasła</h2>
-                    <form method="post">
+                    <div class="model-content-user-head-edit">
+                        <h3 class="modal-content-user-title">Edycja Hasła</h3>
+                    </div>
+                    <form method="post" class="modal-content-edit-user">
                         <div class="page-dashboard-edit-profile-container">
                             <div class="page-dashboard-edit-profile-container-data">
                                 <h5>Obecne Hasło</h5>
@@ -710,8 +807,10 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                     </form>
                 <?php endif; ?>
                 <?php if ($section === 'address'): ?>
-                    <h2>Edycja Adresu</h2>
-                    <form method="post">
+                    <div class="model-content-user-head-edit">
+                        <h3 class="modal-content-user-title">Edycja Adresu</h3>
+                    </div>
+                    <form method="post" class="modal-content-edit-user">
                         <div class="page-dashboard-edit-profile-container">
                             <div class="page-about-content-top-first-contact-subsections">
                                 <div class="page-dashboard-edit-profile-container-address">
@@ -738,8 +837,10 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                     </form>
                 <?php endif; ?>
                 <?php if ($section === 'contact'): ?>
-                    <h2>Edycja Kontaktu</h2>
-                    <form method="post">
+                    <div class="model-content-user-head-edit">
+                        <h3 class="modal-content-user-title">Edycja Kontaktu</h3>
+                    </div>
+                    <form method="post" class="modal-content-edit-user">
                         <div class="page-dashboard-edit-profile-container">
                             <div class="page-dashboard-edit-profile-container-data">
                                 <h5>Numer Telefonu</h5>
@@ -828,6 +929,7 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
             const orderServiceName = orderRow.querySelector('.page-dashboard-orders-user-single-service-name').value;
             const orderServicePrice= orderRow.querySelector('.page-dashboard-orders-user-single-service-price').value;
             const orderServiceDesc= orderRow.querySelector('.page-dashboard-orders-user-single-service-desc').value;
+            const orderFixDesc= orderRow.querySelector('.page-dashboard-orders-user-single-service-fix-desc').value;
 
             const modalContent = modalOrder.querySelector('.modal-content-order');
             modalContent.innerHTML = `
@@ -840,10 +942,6 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                     <div class="modal-order-detail">
                         <p>ID Zamówienia:</p>
                         <div>${orderId}</div>
-                    </div>
-                    <div class="modal-order-detail">
-                        <p>Urządzenie:</p>
-                        <div>${orderDeviceType}</div>
                     </div>
                     <div class="modal-order-detail">
                         <p>Nazwa:</p>
@@ -882,6 +980,10 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                         <div>${orderServiceDesc}</div>
                     </div>
                     <div class="modal-order-detail">
+                        <p>Opis Naprawy:</p>
+                        <div>${orderFixDesc}</div>
+                    </div>
+                    <div class="modal-order-detail">
                         <p>Cena Usługi:</p>
                         <div>${orderServicePrice} zł</div>
                     </div>
@@ -909,15 +1011,62 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
     const buttonsAdminOrder = document.querySelectorAll('.page-dashboard-orders-user-single-show-admin');
     const closeModalAdminOrderButton = document.getElementById('close-modal-admin-order');
 
+    <?php
+    $statusOptions = '';
+    if ($isAdmin) {
+        $sql = "SELECT Id_Statusu, Nazwa FROM status";
+        $result = $conn->query($sql);
+
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $statusOptions .= "<option value='" . htmlspecialchars($row['Id_Statusu']) . "'>" .
+                htmlspecialchars($row['Nazwa']) . "</option>";
+        }
+    }
+    ?>
+
+    <?php
+    $statusEmployee = '';
+    if ($isAdmin) {
+        $sql = "SELECT Id_Pracownika, Imie, Nazwisko, Stanowisko, Email, Telefon FROM pracownicy";
+        $result = $conn->query($sql);
+
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $statusEmployee .= "<option value='" . htmlspecialchars($row['Id_Pracownika']) . "'>" .
+                htmlspecialchars($row['Imie']) . " " . htmlspecialchars($row['Nazwisko']) . " - " . htmlspecialchars($row['Stanowisko']) . "</option>";
+        }
+
+    }
+    ?>
+
+    <?php
+    $statusService = '';
+
+    if ($isAdmin) {
+
+        $sql = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia FROM usługi";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $statusService .= "<option value='" . htmlspecialchars($row['Id_Usługi']) . "'>" .
+                htmlspecialchars($row['Nazwa']) . " - " . htmlspecialchars($row['Cena']) . "</option>";
+        }
+    }
+    ?>
+
+
+
     function closeModalAdminOrder() {
         modalAdminOrder.style.display = 'none';
     }
+
 
     buttonsAdminOrder.forEach((button) => {
         button.addEventListener('click', (event) => {
             event.preventDefault();
 
             const orderRow = button.closest('.page-dashboard-orders-user-single-order-admin');
+
             const orderId = orderRow.querySelector('.page-dashboard-orders-user-single-id-admin').textContent;
             const orderDevice = orderRow.querySelector('.page-dashboard-orders-user-single-section-device-admin').textContent;
             const orderDateAcceptance = orderRow.querySelector('.page-dashboard-orders-user-single-date-reception-admin').textContent;
@@ -933,6 +1082,11 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
             const orderEmployeeSurname = orderRow.querySelector('.page-dashboard-admin-orders-employee-surname').value;
             const orderServiceName = orderRow.querySelector('.page-dashboard-admin-orders-service-name').value;
             const orderServicePrice = orderRow.querySelector('.page-dashboard-admin-orders-service-price').value;
+            const orderStatusId = orderRow.querySelector('.page-dashboard-admin-orders-service-status-id').value;
+            const orderFixDesc = orderRow.querySelector('.page-dashboard-admin-orders-service-fix-desc').value;
+            const orderEmployeeId = orderRow.querySelector('.page-dashboard-admin-orders-service-employee-id').value;
+            const orderServiceId = orderRow.querySelector('.page-dashboard-admin-orders-service-id').value;
+            const orderDeviceTypeId = orderRow.querySelector('.page-dashboard-admin-orders-device-type-id').value;
 
             const modalContent = modalAdminOrder.querySelector('.modal-content-admin-order');
             modalContent.innerHTML = `
@@ -940,7 +1094,7 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                 <div class="model-content-admin-order-head">
                     <h3 class="modal-content-admin-order-title">Szczegóły Zamówienia</h3>
                 </div>
-                <div class="modal-admin-order-details">
+                <form method="post" class="modal-admin-order-details">
                     <div class="modal-admin-order-detail">
                         <p>ID Zamówienia:</p>
                         <div>${orderId}</div>
@@ -948,10 +1102,6 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                     <div class="modal-admin-order-detail">
                         <p>Imie Nazwisko:</p>
                         <div>${orderFirstname} ${orderLastname}</div>
-                    </div>
-                    <div class="modal-admin-order-detail">
-                        <p>Urządzenie:</p>
-                        <div>${orderDeviceType}</div>
                     </div>
                     <div class="modal-admin-order-detail">
                         <p>Nazwa:</p>
@@ -967,8 +1117,9 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                     </div>
                     <div class="modal-admin-order-detail">
                         <p>Status Zamówienia:</p>
-                        <div>${orderStatus}</div>
-                        <img src="/public/edit-icon-order.svg" width="20" height="20"/>
+                        <select name="edit-order-status-id" required class="page-dashboard-edit-order-container-select">
+                            <?php echo $statusOptions; ?>
+                        </select>
                     </div>
                     <div class="modal-admin-order-detail">
                         <p>Metoda Płatności:</p>
@@ -980,23 +1131,43 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
                     </div>
                     <div class="modal-admin-order-detail">
                         <p>Data Zakończenia:</p>
-                        <div>${orderDateCompletion}</div>
-                        <img src="/public/edit-icon-order.svg" width="20" height="20"/>
+                        <input type="date" id="order-completion-date" name="edit-order-completion-date" value= ${orderDateCompletion} class="page-dashboard-edit-order-container-input"/>
                     </div>
                     <div class="modal-admin-order-detail">
                         <p>Serwisant:</p>
-                        <div>${orderEmployeeName} ${orderEmployeeSurname}</div>
+                        <select name="edit-order-employee-id" required class="page-dashboard-edit-order-container-select">
+                            <?php echo $statusEmployee; ?>
+                        </select>
                     </div>
                     <div class="modal-admin-order-detail">
                         <p>Nazwa Usługi:</p>
                         <div>${orderServiceName}</div>
+                        <select name="edit-order-service-id" required class="page-dashboard-edit-order-container-select">
+                            <?php echo $statusService; ?>
+                        </select>
+                    </div>
+                    <div class="modal-admin-order-detail">
+                        <p>Opis Naprawy:</p>
+                        <textarea name="edit-order-fix-description">${orderFixDesc}</textarea>
                     </div>
                     <div class="modal-admin-order-detail">
                         <p>Cena Usługi:</p>
                         <div>${orderServicePrice} zł</div>
                     </div>
-                </div>
+                    <button type="submit" name="update_order" class="page-dashboard-edit-order-container-button">Zapisz zmiany</button>
+                    <input type="hidden" name="edit-order-id" value= ${orderId}/>
+
+                </form>
             `;
+
+            const selectElement = modalContent.querySelector('select[name="edit-order-status-id"]');
+            selectElement.value = orderStatusId;
+
+            const selectElementEmployee = modalContent.querySelector('select[name="edit-order-employee-id"]');
+            selectElementEmployee.value = orderEmployeeId;
+
+            const selectElementService = modalContent.querySelector('select[name="edit-order-service-id"]');
+            selectElementService.value = orderServiceId;
 
             const closeButton = modalContent.querySelector('.close-modal-admin-order');
             closeButton.addEventListener('click', closeModalAdminOrder);
@@ -1016,7 +1187,7 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
 
 <script>
     const modalUser = document.getElementById('modal-user');
-    const buttonsUser = document.querySelectorAll('.page-dashboard-admin-single-user');
+    const buttonsUser = document.querySelectorAll('.page-dashboard-orders-user-single-show-admin-profile');
     const closeModalUserButton = document.getElementById('close-modal-user');
 
     function closeModalUser() {
@@ -1042,7 +1213,7 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
             modalContent.innerHTML = `
                 <button id="close-modal-user" class="close-modal-user">&times;</button>
                 <div class="model-content-user-head">
-                    <h3 class="modal-content-user-title">Dane Użytkownika</h3>
+                    <h3 class="modal-content-admin-order-title">Dane Użytkownika</h3>
                 </div>
                 <div class="modal-user-details">
                     <div class="modal-user-detail">
@@ -1102,7 +1273,7 @@ $edit = isset($_POST['edit']) ? $_POST['edit'] : 'profile';
 
 <script>
     const modalEmployee = document.getElementById('modal-employee');
-    const buttonsEmployee = document.querySelectorAll('.page-dashboard-admin-single-employee');
+    const buttonsEmployee = document.querySelectorAll('.page-dashboard-orders-user-single-show-admin-profile');
     const closeModalEmployeeButton = document.getElementById('close-modal-employee');
 
     function closeModalEmployee() {

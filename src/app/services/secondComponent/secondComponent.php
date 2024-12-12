@@ -476,6 +476,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
 
 ?>
 
+
+
 <div class="page-services-second-back">
     <div class="page-services-second-container">
         <form method="post" class="page-services-second-grid">
