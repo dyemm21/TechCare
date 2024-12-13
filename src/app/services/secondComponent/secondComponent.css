@@ -1,11 +1,11 @@
 .page-services-second-back{
-    background-color: #f0f9ff;
+    background-color: #f6f6f6;
     border-radius: 20px;
     /*margin: 50px 0 50px 0;*/
 }
 .page-services-second-container{
     width: 1536px;
-    padding: 90px 50px 90px 50px;
+    padding: 120px 50px 120px 50px;
     margin: auto;
     display: flex;
     flex-direction: column;

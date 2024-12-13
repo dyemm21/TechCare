@@ -1,11 +1,25 @@
 
 .login-first-container{
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: relative;
+    width: 100%;
     min-height: calc(100vh - 80px);
+    overflow: hidden;
+    border-radius: 5px;
+}
+.login-first-container image{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
 }
 .login-first-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Wycentrowanie w pionie i poziomie */
     width: 550px;
     padding: 50px;
     border-radius: 5px;

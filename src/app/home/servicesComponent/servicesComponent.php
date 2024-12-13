@@ -21,7 +21,7 @@
                     <div class="service-icon">
                         <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M20 18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z'/%3E%3C/svg%3E" alt="Desktop icon">
                     </div>
-                    <h3 class="service-title">Desktop Repair</h3>
+                    <h3 class="service-title">Laptop Repair</h3>
                     <p class="service-description">Set power royal this boss it and of take all that, space hands and of the found in week</p>
                     <a href="?page=services" class="read-more">See More</a>
                 </div>

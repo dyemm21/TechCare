@@ -54,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body>
 <div class="login-first-container">
+    <img src="/public/background5.jpg" alt="background-image" class="hero-background-image">
     <div class="login-first-content">
         <form class="login-first-form" method="POST" action="">
             <h3>Welcome Back</h3>

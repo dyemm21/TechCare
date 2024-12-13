@@ -88,6 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 ?>
 
 <div class="register-first-container">
+    <img src="/public/background5.jpg" alt="background-image" class="hero-background-image">
     <div class="register-first-content">
         <?php if (isset($error)): ?>
             <div class="error-message"><?php echo htmlspecialchars($error); ?></div>

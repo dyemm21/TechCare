@@ -156,6 +156,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-phone']))
     $idStatus = "2116961730";
     $idService = $_POST['service_id_phone'] ?? null;
 
+    $query = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
+        FROM usługi 
+        WHERE Id_Usługi = :service_id";
+
+    $res = $conn->prepare($query);
+    $res->bindParam(':service_id', $idService, PDO::PARAM_INT);
+    $res->execute();
+    $serviceId = $res->fetch(PDO::FETCH_ASSOC);
+    $price = $serviceId['Cena'];
+
+
     if ($newPhoneMark &&  $newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
 
         try {
@@ -170,7 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-phone']))
             $stmt->bindParam(':description', $newPhoneProblemDesc);
             $stmt->execute();
 
-            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi,Id_Płatności) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment)");
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi,Id_Płatności, Cena_Zlecenia) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
 
             $stmt->bindParam(':id_order', $idOrder);
             $stmt->bindParam(':id_device',$idDevice );
@@ -180,6 +191,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-phone']))
             $stmt->bindParam(':id_status', $idStatus);
             $stmt->bindParam(':id_service', $idService);
             $stmt->bindParam(':id_payment', $newIdPayment);
+            $stmt->bindParam(':price', $price);
             $stmt->execute();
 
             header('Location: ?page=dashboard');
@@ -211,6 +223,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-laptop'])
     $idStatus = "2116961730";
     $idService = $_POST['service_id_laptop'] ?? null;
 
+    $query = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
+        FROM usługi 
+        WHERE Id_Usługi = :service_id";
+
+    $res = $conn->prepare($query);
+    $res->bindParam(':service_id', $idService, PDO::PARAM_INT);
+    $res->execute();
+    $serviceId = $res->fetch(PDO::FETCH_ASSOC);
+    $price = $serviceId['Cena'];
+
     if ($newPhoneMark &&  $newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
 
         try {
@@ -225,7 +247,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-laptop'])
             $stmt->bindParam(':description', $newPhoneProblemDesc);
             $stmt->execute();
 
-            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment)");
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności, Cena_Zlecenia) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
 
             $stmt->bindParam(':id_order', $idOrder);
             $stmt->bindParam(':id_device',$idDevice );
@@ -235,6 +257,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-laptop'])
             $stmt->bindParam(':id_status', $idStatus);
             $stmt->bindParam(':id_service', $idService);
             $stmt->bindParam(':id_payment', $newIdPayment);
+            $stmt->bindParam(':price', $price);
             $stmt->execute();
 
             header('Location: ?page=dashboard');
@@ -266,6 +289,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-iphone'])
     $idStatus = "2116961730";
     $idService = $_POST['service_id_iphone'] ?? null;
 
+    $query = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
+        FROM usługi 
+        WHERE Id_Usługi = :service_id";
+
+    $res = $conn->prepare($query);
+    $res->bindParam(':service_id', $idService, PDO::PARAM_INT);
+    $res->execute();
+    $serviceId = $res->fetch(PDO::FETCH_ASSOC);
+    $price = $serviceId['Cena'];
+
     if ($newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
 
         try {
@@ -280,7 +313,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-iphone'])
             $stmt->bindParam(':description', $newPhoneProblemDesc);
             $stmt->execute();
 
-            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment)");
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności, Cena_Zlecenia) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
 
             $stmt->bindParam(':id_order', $idOrder);
             $stmt->bindParam(':id_device',$idDevice );
@@ -290,6 +323,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-iphone'])
             $stmt->bindParam(':id_status', $idStatus);
             $stmt->bindParam(':id_service', $idService);
             $stmt->bindParam(':id_payment', $newIdPayment);
+            $stmt->bindParam(':price', $price);
             $stmt->execute();
 
             header('Location: ?page=dashboard');
@@ -321,6 +355,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-macbook']
     $idStatus = "2116961730";
     $idService = $_POST['service_id_macbook'] ?? null;
 
+    $query = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
+        FROM usługi 
+        WHERE Id_Usługi = :service_id";
+
+    $res = $conn->prepare($query);
+    $res->bindParam(':service_id', $idService, PDO::PARAM_INT);
+    $res->execute();
+    $serviceId = $res->fetch(PDO::FETCH_ASSOC);
+    $price = $serviceId['Cena'];
+
     if ($newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
 
         try {
@@ -335,7 +379,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-macbook']
             $stmt->bindParam(':description', $newPhoneProblemDesc);
             $stmt->execute();
 
-            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment)");
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności, Cena_Zlecenia) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
 
             $stmt->bindParam(':id_order', $idOrder);
             $stmt->bindParam(':id_device',$idDevice );
@@ -345,6 +389,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-macbook']
             $stmt->bindParam(':id_status', $idStatus);
             $stmt->bindParam(':id_service', $idService);
             $stmt->bindParam(':id_payment', $newIdPayment);
+            $stmt->bindParam(':price', $price);
             $stmt->execute();
 
             header('Location: ?page=dashboard');
@@ -376,6 +421,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-ipad'])) 
     $idStatus = "2116961730";
     $idService = $_POST['service_id_ipad'] ?? null;
 
+    $query = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
+        FROM usługi 
+        WHERE Id_Usługi = :service_id";
+
+    $res = $conn->prepare($query);
+    $res->bindParam(':service_id', $idService, PDO::PARAM_INT);
+    $res->execute();
+    $serviceId = $res->fetch(PDO::FETCH_ASSOC);
+    $price = $serviceId['Cena'];
+
     if ($newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
 
         try {
@@ -390,7 +445,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-ipad'])) 
             $stmt->bindParam(':description', $newPhoneProblemDesc);
             $stmt->execute();
 
-            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment)");
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności, Cena_Zlecenia) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
 
             $stmt->bindParam(':id_order', $idOrder);
             $stmt->bindParam(':id_device',$idDevice );
@@ -400,6 +455,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-ipad'])) 
             $stmt->bindParam(':id_status', $idStatus);
             $stmt->bindParam(':id_service', $idService);
             $stmt->bindParam(':id_payment', $newIdPayment);
+            $stmt->bindParam(':price', $price);
             $stmt->execute();
 
             header('Location: ?page=dashboard');
@@ -432,6 +488,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
     $idStatus = "2116961730";
     $idService = $_POST['service_id_tablet'] ?? null;
 
+    $query = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
+        FROM usługi 
+        WHERE Id_Usługi = :service_id";
+
+    $res = $conn->prepare($query);
+    $res->bindParam(':service_id', $idService, PDO::PARAM_INT);
+    $res->execute();
+    $serviceId = $res->fetch(PDO::FETCH_ASSOC);
+    $price = $serviceId['Cena'];
+
     if ($newPhoneMark &&  $newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
 
         try {
@@ -446,7 +512,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
             $stmt->bindParam(':description', $newPhoneProblemDesc);
             $stmt->execute();
 
-            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment)");
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności, Cena_Zlecenia) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
 
             $stmt->bindParam(':id_order', $idOrder);
             $stmt->bindParam(':id_device',$idDevice );
@@ -456,6 +522,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
             $stmt->bindParam(':id_status', $idStatus);
             $stmt->bindParam(':id_service', $idService);
             $stmt->bindParam(':id_payment', $newIdPayment);
+            $stmt->bindParam(':price', $price);
             $stmt->execute();
 
             header('Location: ?page=dashboard');
@@ -475,7 +542,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
 
 
 ?>
-
 
 
 <div class="page-services-second-back">

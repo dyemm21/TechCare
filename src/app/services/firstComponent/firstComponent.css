@@ -1,40 +1,60 @@
 .page-services-first-back
 {
-    background: linear-gradient(to bottom, #ffffff, #f8f8f8);
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 70px);
+    overflow: hidden;
+    border-radius: 5px;
+}
+.page-services-first-back img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Dopasowanie obrazu */
+    z-index: -1; /* Ustawienie obrazu w tle */
 }
 
 .page-services-first-container{
-    width: 1536px;
-    padding: 0 50px;
-    margin: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Wycentrowanie w pionie i poziomie */
+    text-align: center;
+    color: white;
+    max-width: 900px;
+    padding: 20px;
 }
 .page-services-first{
-    display: flex;
-    flex-direction: column;
+    /*display: flex;*/
+    /*flex-direction: column;*/
     /*gap: 70px;*/
 }
 .page-services-first-head {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    height: calc(100vh - 60px);
+    /*display: flex;*/
+    /*flex-direction: column;*/
+    /*gap: 20px;*/
+    /*align-items: center;*/
+    /*justify-content: center;*/
+    /*text-align: center;*/
+    /*height: calc(100vh - 60px);*/
 }
 .page-services-first-head h1{
     font-size: 52px;
     letter-spacing: 1px;
+    margin-bottom: 20px;
+    color: #151515;
 }
 .page-services-first-head p{
     font-size: 20px;
-    color: #555;
-    width: 700px;
-    margin-bottom: 10px;
+    color: #222222;
+    margin-bottom: 30px;
 }
 .page-services-first-buttons{
     display: flex;
-    gap: 50px;
+    gap: 20px;
+    justify-content: center;
 }
 .page-services-first-buttons button{
     padding: 15px 20px;

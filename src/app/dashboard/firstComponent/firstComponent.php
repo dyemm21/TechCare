@@ -42,6 +42,7 @@ $sql = "
         z.Id_Statusu,
         s.Nazwa AS Nazwa_Statusu,
         z.Data_Zakończenia,
+        z.Cena_Zlecenia,
         z.Id_Usługi,
         u.Id_Klienta,
         u.Id_TypuUrządzenia,
@@ -92,6 +93,7 @@ if ($isAdmin) {
             s.Nazwa AS Nazwa_Statusu, 
             z.Data_Zakończenia,
             z.Id_Usługi,
+            z.Cena_Zlecenia,
             u.Id_Klienta,
             u.Id_TypuUrządzenia,
             u.Marka,
@@ -344,12 +346,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
     $newEmployeeId = $_POST['edit-order-employee-id'] ?? null;
     $newServiceId = $_POST['edit-order-service-id'] ?? null;
     $newDateCompletion = $_POST['edit-order-completion-date'] ?? null;
+    $newDateAcceptance = $_POST['edit-order-acceptance-date'] ?? null;
     $newOrderId= $_POST['edit-order-id'] ?? null;
     $newOrderFixDesc= $_POST['edit-order-fix-description'] ?? null;
+    $newOrderPaymentId= $_POST['edit-order-payment-id'] ?? null;
+    $newOrderPrice= $_POST['edit-order-service-price'] ?? null;
 
     if ($newStatusId && $newDateCompletion && $newOrderId) {
-        $stmt = $conn->prepare("UPDATE zlecenia SET Id_Statusu = ?, Data_Zakończenia = ?, Opis_Problemu = ?, Id_Pracownika = ?, Id_Usługi = ? WHERE Id_Zlecenia  = ?");
-        $stmt->execute([$newStatusId, $newDateCompletion, $newOrderFixDesc, $newEmployeeId, $newServiceId, $newOrderId]);
+        $stmt = $conn->prepare("UPDATE zlecenia SET Id_Statusu = ?, Data_Zakończenia = ?, Opis_Problemu = ?, Id_Pracownika = ?, Id_Usługi = ?, Id_Płatności = ?, Data_Przyjęcia = ?, Cena_Zlecenia = ? WHERE Id_Zlecenia  = ?");
+        $stmt->execute([$newStatusId, $newDateCompletion, $newOrderFixDesc, $newEmployeeId, $newServiceId, $newOrderPaymentId, $newDateAcceptance, $newOrderPrice, $newOrderId]);
 
     } else {
         echo "Nie udalo sie zmienic zamowienia";
@@ -364,6 +369,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
 
 
 <div class="page-dashboard-first-back">
+    <img src="/public/background11.jpg" alt="background-image" class="hero-background-image">
     <div class="page-dashboard-first-container">
         <div class="page-dashboard">
             <div class="page-dashboard-menu">
@@ -530,6 +536,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
                                                     Zamówienia
                                                 </button>
                                             </form>
+<!--                                            <div class="page-dashboard-orders-user-single-show-admin-profile" type="submit" data-user="user" >Edytuj</div>-->
                                             <input type="hidden" class="page-dashboard-admin-user-id" value="<?php echo htmlspecialchars($users['Id_Klienta']); ?>" />
                                             <input type="hidden" class="page-dashboard-admin-user-firstname" value="<?php echo htmlspecialchars($users['Imie']); ?>" />
                                             <input type="hidden" class="page-dashboard-admin-user-lastname" value="<?php echo htmlspecialchars($users['Nazwisko']); ?>" />
@@ -675,6 +682,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
                                         <input type="hidden" class="page-dashboard-admin-orders-service-employee-id" value="<?php echo htmlspecialchars($order['Id_Pracownika']); ?>"/>
                                         <input type="hidden" class="page-dashboard-admin-orders-service-id" value="<?php echo htmlspecialchars($order['Id_Usługi']); ?>"/>
                                         <input type="hidden" class="page-dashboard-admin-orders-device-type-id" value="<?php echo htmlspecialchars($order['Id_TypuUrządzenia']); ?>"/>
+                                        <input type="hidden" class="page-dashboard-admin-orders-payment-id" value="<?php echo htmlspecialchars($order['Id_Płatności']); ?>"/>
+                                        <input type="hidden" class="page-dashboard-admin-orders-price" value="<?php echo htmlspecialchars($order['Cena_Zlecenia']); ?>"/>
 
                                     </div>
                                 <?php endforeach; ?>
@@ -752,6 +761,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
                                         <input type="hidden" class="page-dashboard-orders-user-single-service-price" value="<?php echo htmlspecialchars($order['Cena_Usługi']); ?>"/>
                                         <input type="hidden" class="page-dashboard-orders-user-single-service-desc" value="<?php echo htmlspecialchars($order['Opis_Usługi']); ?>"/>
                                         <input type="hidden" class="page-dashboard-orders-user-single-service-fix-desc" value="<?php echo htmlspecialchars($order['Opis_Naprawy']); ?>"/>
+                                        <input type="hidden" class="page-dashboard-orders-user-single-service-fix-price" value="<?php echo htmlspecialchars($order['Cena_Zlecenia']); ?>"/>
 
                                     </div>
                                 <?php endforeach; ?>
@@ -930,6 +940,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
             const orderServicePrice= orderRow.querySelector('.page-dashboard-orders-user-single-service-price').value;
             const orderServiceDesc= orderRow.querySelector('.page-dashboard-orders-user-single-service-desc').value;
             const orderFixDesc= orderRow.querySelector('.page-dashboard-orders-user-single-service-fix-desc').value;
+            const orderFixPrice= orderRow.querySelector('.page-dashboard-orders-user-single-service-fix-price').value;
 
             const modalContent = modalOrder.querySelector('.modal-content-order');
             modalContent.innerHTML = `
@@ -985,7 +996,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
                     </div>
                     <div class="modal-order-detail">
                         <p>Cena Usługi:</p>
-                        <div>${orderServicePrice} zł</div>
+                        <div>${orderFixPrice} zł</div>
                     </div>
                 </div>
             `;
@@ -1054,6 +1065,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
     }
     ?>
 
+    <?php
+    $methodPayment = '';
+
+    if ($isAdmin) {
+
+        $sql = "SELECT Id_Płatności, Nazwa_Płatności FROM płatność";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $methodPayment .= "<option value='" . htmlspecialchars($row['Id_Płatności']) . "'>" .
+                htmlspecialchars($row['Nazwa_Płatności']) . "</option>";
+        }
+    }
+    ?>
+
 
 
     function closeModalAdminOrder() {
@@ -1087,6 +1114,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
             const orderEmployeeId = orderRow.querySelector('.page-dashboard-admin-orders-service-employee-id').value;
             const orderServiceId = orderRow.querySelector('.page-dashboard-admin-orders-service-id').value;
             const orderDeviceTypeId = orderRow.querySelector('.page-dashboard-admin-orders-device-type-id').value;
+            const orderPaymentId = orderRow.querySelector('.page-dashboard-admin-orders-payment-id').value;
+            const orderPrice = orderRow.querySelector('.page-dashboard-admin-orders-price').value;
 
             const modalContent = modalAdminOrder.querySelector('.modal-content-admin-order');
             modalContent.innerHTML = `
@@ -1123,11 +1152,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
                     </div>
                     <div class="modal-admin-order-detail">
                         <p>Metoda Płatności:</p>
-                        <div>${orderPayment}</div>
+                        <select name="edit-order-payment-id" required class="page-dashboard-edit-order-container-select">
+                            <?php echo $methodPayment; ?>
+                        </select>
                     </div>
                     <div class="modal-admin-order-detail">
                         <p>Data Przyjęcia:</p>
-                        <div>${orderDateAcceptance}</div>
+                        <input type="date" id="order-acceptance-date" name="edit-order-acceptance-date" value= ${orderDateAcceptance} class="page-dashboard-edit-order-container-input"/>
+
                     </div>
                     <div class="modal-admin-order-detail">
                         <p>Data Zakończenia:</p>
@@ -1152,11 +1184,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
                     </div>
                     <div class="modal-admin-order-detail">
                         <p>Cena Usługi:</p>
-                        <div>${orderServicePrice} zł</div>
+                        <input type="number" name= "edit-order-service-price" placeholder="Cena Usługi" value=${orderPrice} class="page-dashboard-edit-order-container-input"/>
+                        <div>zł</div>
                     </div>
                     <button type="submit" name="update_order" class="page-dashboard-edit-order-container-button">Zapisz zmiany</button>
                     <input type="hidden" name="edit-order-id" value= ${orderId}/>
-
                 </form>
             `;
 
@@ -1168,6 +1200,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
 
             const selectElementService = modalContent.querySelector('select[name="edit-order-service-id"]');
             selectElementService.value = orderServiceId;
+
+            const selectElementPayment = modalContent.querySelector('select[name="edit-order-payment-id"]');
+            selectElementPayment.value = orderPaymentId;
 
             const closeButton = modalContent.querySelector('.close-modal-admin-order');
             closeButton.addEventListener('click', closeModalAdminOrder);
