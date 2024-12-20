@@ -18,7 +18,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($user && password_verify($password, $user['Haslo'])) {
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = "Invalid email format";
+    } elseif (empty($password)) {
+        $error = "Password cannot be empty";
+    }
+    else if ($user && password_verify($password, $user['Haslo'])) {
         $_SESSION['LoginId'] = $user['Id_Logowania'];
         $_SESSION['email'] = $user['Email'];
         $Id_Logowania = $user['Id_Logowania'];
@@ -38,22 +43,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION['isAdmin'] = $client['isAdmin'];
         }
 
-        header("Location: ?page=dashboard");
+        header("Location: ?page=home");
         exit();
     } else {
-        $error = "Nieprawidłowy email lub hasło!";
+        $error = "Invalid email or password";
     }
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>Logowanie</title>
-</head>
-<body>
 <div class="login-first-container">
+    <?php if (isset($error)): ?>
+        <div class="error-message-login"><?php echo htmlspecialchars($error); ?></div>
+    <?php endif; ?>
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="success-message-login"><?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></div>
+    <?php endif; ?>
     <img src="/public/background5.jpg" alt="background-image" class="hero-background-image">
     <div class="login-first-content">
         <form class="login-first-form" method="POST" action="">
@@ -64,10 +68,47 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <button type="submit" class="login-first-button">Login</button>
             <a href="?page=register" class="login-first-register">Don&apos;t have an account? <b>Register</b></a>
         </form>
-        <?php if (isset($error)): ?>
-            <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
-        <?php endif; ?>
     </div>
 </div>
-</body>
-</html>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.querySelector('.login-first-form');
+        form.addEventListener('submit', (event) => {
+            const email = form.email.value.trim();
+            const password = form.password.value;
+
+            const errorMessages = document.querySelectorAll('.error-message-login');
+            errorMessages.forEach(msg => msg.remove());
+
+            let valid = true;
+
+            if (!validateEmail(email)) {
+                showError(form.email, "Invalid email address");
+                valid = false;
+            }
+
+            else if (password.length < 1) {
+                showError(form.password, "Password cannot be empty");
+                valid = false;
+            }
+
+            else if (!valid) {
+                event.preventDefault();
+            }
+        });
+
+        function showError(input, message) {
+            const error = document.createElement('div');
+            error.className = 'error-message-login2';
+            error.textContent = message;
+            input.insertAdjacentElement('afterend', error);
+        }
+
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+    });
+</script>
+

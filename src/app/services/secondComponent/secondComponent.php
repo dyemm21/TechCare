@@ -5,10 +5,6 @@ require 'db.php';
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-function generateUniqueId() {
-    return rand(1, 2147483647);
-}
-
 
 $LoginId= $_SESSION['LoginId'] ?? null;
 $email = $_SESSION['email'] ?? null;
@@ -140,20 +136,25 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         htmlspecialchars($row['Cena']) . " zł" ."</option>";
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-phone'])) {
-    $newPhoneMark = $_POST['phone_mark'] ?? null;
-    $newPhoneModel = $_POST['phone_model'] ?? null;
-    $newPhoneSerialNumber = $_POST['phone_serial_number'] ?? null;
-    $newPhoneProblemDesc = $_POST['phone_problem_description'] ?? null;
-    $newIdEmployee = $_POST['employee_id'] ?? null;
-    $newIdPayment = $_POST['payment_id'] ?? null;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-phone']))
+{
+    $newPhoneMark = trim($_POST['phone_mark']) ?? null;
+    $newPhoneModel = trim($_POST['phone_model']) ?? null;
+    $newPhoneSerialNumber = trim($_POST['phone_serial_number']) ?? null;
+    $newPhoneProblemDesc = trim($_POST['phone_problem_description']) ?? null;
+    $newIdEmployee = trim($_POST['employee_id']) ?? null;
+    $newIdPayment = trim($_POST['payment_id']) ?? null;
+    $idStatus = "2116961735";
 
-    $idDevice = generateUniqueId();
-    $idOrder = generateUniqueId();
+    if($newIdPayment != '2116216192')
+    {
+        $idStatus = "2116961733";
+    }
+
     $idTypeDevice = "2116961740";
 
     $newDateReception = (new DateTime())->format('Y-m-d');
-    $idStatus = "2116961730";
+
     $idService = $_POST['service_id_phone'] ?? null;
 
     $query = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
@@ -170,9 +171,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-phone']))
     if ($newPhoneMark &&  $newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
 
         try {
-            $stmt = $conn->prepare("INSERT INTO urządzenia (Id_Urządzenia, Id_Klienta, Id_TypuUrządzenia, Marka, Model, Numer_Seryjny, Opis_problemu) VALUES (:id_device, :id_client, :id_type_device, :mark, :model, :serial_number, :description)");
+            $stmt = $conn->prepare("INSERT INTO urządzenia (Id_Klienta, Id_TypuUrządzenia, Marka, Model, Numer_Seryjny, Opis_problemu) VALUES (:id_client, :id_type_device, :mark, :model, :serial_number, :description)");
 
-            $stmt->bindParam(':id_device', $idDevice);
             $stmt->bindParam(':id_client',$ClientId );
             $stmt->bindParam(':id_type_device', $idTypeDevice);
             $stmt->bindParam(':mark', $newPhoneMark);
@@ -181,13 +181,86 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-phone']))
             $stmt->bindParam(':description', $newPhoneProblemDesc);
             $stmt->execute();
 
-            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi,Id_Płatności, Cena_Zlecenia) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
+            $idDevice = $conn->lastInsertId();
 
-            $stmt->bindParam(':id_order', $idOrder);
+            $fixDesc = '';
+
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi,Id_Płatności, Cena_Zlecenia) VALUES (:id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
+
             $stmt->bindParam(':id_device',$idDevice );
             $stmt->bindParam(':id_employee', $newIdEmployee);
             $stmt->bindParam(':date_reception', $newDateReception);
-            $stmt->bindParam(':issue_desc', $newPhoneProblemDesc);
+            $stmt->bindParam(':issue_desc', $fixDesc);
+            $stmt->bindParam(':id_status', $idStatus);
+            $stmt->bindParam(':id_service', $idService);
+            $stmt->bindParam(':id_payment', $newIdPayment);
+            $stmt->bindParam(':price', $price);
+            $stmt->execute();
+
+            header('Location: ?page=dashboard');
+            exit();
+
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            echo "An error occurred. Please try again.";
+        }
+
+    } else
+    {
+        echo "Nie udalo sie dodac nowej uslugi (Telefon)";
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-basket-phone']))
+{
+    $newPhoneMark = trim($_POST['phone_mark']) ?? null;
+    $newPhoneModel = trim($_POST['phone_model']) ?? null;
+    $newPhoneSerialNumber = trim($_POST['phone_serial_number']) ?? null;
+    $newPhoneProblemDesc = trim($_POST['phone_problem_description']) ?? null;
+    $newIdEmployee = trim($_POST['employee_id']) ?? null;
+    $newIdPayment = '2116216192';
+    $idStatus = "2116961735";
+
+    $idTypeDevice = "2116961740";
+
+    $newDateReception = (new DateTime())->format('Y-m-d');
+
+    $idService = $_POST['service_id_phone'] ?? null;
+
+    $query = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
+        FROM usługi 
+        WHERE Id_Usługi = :service_id";
+
+    $res = $conn->prepare($query);
+    $res->bindParam(':service_id', $idService, PDO::PARAM_INT);
+    $res->execute();
+    $serviceId = $res->fetch(PDO::FETCH_ASSOC);
+    $price = $serviceId['Cena'];
+
+
+    if ($newPhoneMark &&  $newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
+
+        try {
+            $stmt = $conn->prepare("INSERT INTO urządzenia (Id_Klienta, Id_TypuUrządzenia, Marka, Model, Numer_Seryjny, Opis_problemu) VALUES (:id_client, :id_type_device, :mark, :model, :serial_number, :description)");
+
+            $stmt->bindParam(':id_client',$ClientId );
+            $stmt->bindParam(':id_type_device', $idTypeDevice);
+            $stmt->bindParam(':mark', $newPhoneMark);
+            $stmt->bindParam(':model', $newPhoneModel);
+            $stmt->bindParam(':serial_number', $newPhoneSerialNumber);
+            $stmt->bindParam(':description', $newPhoneProblemDesc);
+            $stmt->execute();
+
+            $idDevice = $conn->lastInsertId();
+
+            $fixDesc = '';
+
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi,Id_Płatności, Cena_Zlecenia) VALUES (:id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
+
+            $stmt->bindParam(':id_device',$idDevice );
+            $stmt->bindParam(':id_employee', $newIdEmployee);
+            $stmt->bindParam(':date_reception', $newDateReception);
+            $stmt->bindParam(':issue_desc', $fixDesc);
             $stmt->bindParam(':id_status', $idStatus);
             $stmt->bindParam(':id_service', $idService);
             $stmt->bindParam(':id_payment', $newIdPayment);
@@ -208,19 +281,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-phone']))
     }
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-laptop'])) {
-    $newPhoneMark = $_POST['laptop_mark'] ?? null;
-    $newPhoneModel = $_POST['laptop_model'] ?? null;
-    $newPhoneSerialNumber = $_POST['laptop_serial_number'] ?? null;
-    $newPhoneProblemDesc = $_POST['laptop_problem_description'] ?? null;
-    $newIdEmployee = $_POST['employee_id_laptop'] ?? null;
-    $newIdPayment = $_POST['payment_id_laptop'] ?? null;
+    $newPhoneMark = trim($_POST['laptop_mark']) ?? null;
+    $newPhoneModel = trim($_POST['laptop_model']) ?? null;
+    $newPhoneSerialNumber = trim($_POST['laptop_serial_number']) ?? null;
+    $newPhoneProblemDesc = trim($_POST['laptop_problem_description']) ?? null;
+    $newIdEmployee = trim($_POST['employee_id_laptop']) ?? null;
+    $newIdPayment = trim($_POST['payment_id_laptop']) ?? null;
 
-    $idDevice = generateUniqueId();
-    $idOrder = generateUniqueId();
     $idTypeDevice = "2116961742";
 
     $newDateReception = (new DateTime())->format('Y-m-d');
-    $idStatus = "2116961730";
+    $idStatus = "2116961735";
+
+    if($newIdPayment != '2116216192')
+    {
+        $idStatus = "2116961733";
+    }
     $idService = $_POST['service_id_laptop'] ?? null;
 
     $query = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
@@ -236,9 +312,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-laptop'])
     if ($newPhoneMark &&  $newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
 
         try {
-            $stmt = $conn->prepare("INSERT INTO urządzenia (Id_Urządzenia, Id_Klienta, Id_TypuUrządzenia, Marka, Model, Numer_Seryjny, Opis_problemu) VALUES (:id_device, :id_client, :id_type_device, :mark, :model, :serial_number, :description)");
+            $stmt = $conn->prepare("INSERT INTO urządzenia (Id_Klienta, Id_TypuUrządzenia, Marka, Model, Numer_Seryjny, Opis_problemu) VALUES (:id_client, :id_type_device, :mark, :model, :serial_number, :description)");
 
-            $stmt->bindParam(':id_device', $idDevice);
             $stmt->bindParam(':id_client',$ClientId );
             $stmt->bindParam(':id_type_device', $idTypeDevice);
             $stmt->bindParam(':mark', $newPhoneMark);
@@ -247,13 +322,81 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-laptop'])
             $stmt->bindParam(':description', $newPhoneProblemDesc);
             $stmt->execute();
 
-            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności, Cena_Zlecenia) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
+            $idDevice = $conn->lastInsertId();
+            $fixDesc = '';
 
-            $stmt->bindParam(':id_order', $idOrder);
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności, Cena_Zlecenia) VALUES (:id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
+
             $stmt->bindParam(':id_device',$idDevice );
             $stmt->bindParam(':id_employee', $newIdEmployee);
             $stmt->bindParam(':date_reception', $newDateReception);
-            $stmt->bindParam(':issue_desc', $newPhoneProblemDesc);
+            $stmt->bindParam(':issue_desc', $fixDesc);
+            $stmt->bindParam(':id_status', $idStatus);
+            $stmt->bindParam(':id_service', $idService);
+            $stmt->bindParam(':id_payment', $newIdPayment);
+            $stmt->bindParam(':price', $price);
+            $stmt->execute();
+
+            header('Location: ?page=dashboard');
+            exit();
+
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            echo "An error occurred. Please try again.";
+        }
+
+    } else
+    {
+        echo "Nie udalo sie dodac nowej uslugi (Laptop)";
+    }
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-basket-laptop'])) {
+    $newPhoneMark = trim($_POST['laptop_mark']) ?? null;
+    $newPhoneModel = trim($_POST['laptop_model']) ?? null;
+    $newPhoneSerialNumber = trim($_POST['laptop_serial_number']) ?? null;
+    $newPhoneProblemDesc = trim($_POST['laptop_problem_description']) ?? null;
+    $newIdEmployee = trim($_POST['employee_id_laptop']) ?? null;
+    $newIdPayment = '2116216192';
+
+    $idTypeDevice = "2116961742";
+
+    $newDateReception = (new DateTime())->format('Y-m-d');
+    $idStatus = "2116961735";
+
+    $idService = $_POST['service_id_laptop'] ?? null;
+
+    $query = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
+        FROM usługi 
+        WHERE Id_Usługi = :service_id";
+
+    $res = $conn->prepare($query);
+    $res->bindParam(':service_id', $idService, PDO::PARAM_INT);
+    $res->execute();
+    $serviceId = $res->fetch(PDO::FETCH_ASSOC);
+    $price = $serviceId['Cena'];
+
+    if ($newPhoneMark &&  $newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
+
+        try {
+            $stmt = $conn->prepare("INSERT INTO urządzenia (Id_Klienta, Id_TypuUrządzenia, Marka, Model, Numer_Seryjny, Opis_problemu) VALUES (:id_client, :id_type_device, :mark, :model, :serial_number, :description)");
+
+            $stmt->bindParam(':id_client',$ClientId );
+            $stmt->bindParam(':id_type_device', $idTypeDevice);
+            $stmt->bindParam(':mark', $newPhoneMark);
+            $stmt->bindParam(':model', $newPhoneModel);
+            $stmt->bindParam(':serial_number', $newPhoneSerialNumber);
+            $stmt->bindParam(':description', $newPhoneProblemDesc);
+            $stmt->execute();
+
+            $idDevice = $conn->lastInsertId();
+            $fixDesc = '';
+
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności, Cena_Zlecenia) VALUES (:id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
+
+            $stmt->bindParam(':id_device',$idDevice );
+            $stmt->bindParam(':id_employee', $newIdEmployee);
+            $stmt->bindParam(':date_reception', $newDateReception);
+            $stmt->bindParam(':issue_desc', $fixDesc);
             $stmt->bindParam(':id_status', $idStatus);
             $stmt->bindParam(':id_service', $idService);
             $stmt->bindParam(':id_payment', $newIdPayment);
@@ -274,19 +417,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-laptop'])
     }
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-iphone'])) {
-    $newPhoneModel = $_POST['iphone_model'] ?? null;
-    $newPhoneSerialNumber = $_POST['iphone_serial_number'] ?? null;
-    $newPhoneProblemDesc = $_POST['iphone_problem_description'] ?? null;
-    $newIdEmployee = $_POST['iphone_employee_id'] ?? null;
-    $newIdPayment = $_POST['iphone_payment_id'] ?? null;
+    $newPhoneModel = trim($_POST['iphone_model']) ?? null;
+    $newPhoneSerialNumber = trim($_POST['iphone_serial_number']) ?? null;
+    $newPhoneProblemDesc = trim($_POST['iphone_problem_description']) ?? null;
+    $newIdEmployee = trim($_POST['iphone_employee_id']) ?? null;
+    $newIdPayment = trim($_POST['iphone_payment_id']) ?? null;
 
-    $idDevice = generateUniqueId();
-    $idOrder = generateUniqueId();
     $idTypeDevice = "2116961741";
     $Iphone = "iPhone";
 
     $newDateReception = (new DateTime())->format('Y-m-d');
-    $idStatus = "2116961730";
+    $idStatus = "2116961735";
+
+    if($newIdPayment != '2116216192')
+    {
+        $idStatus = "2116961733";
+    }
     $idService = $_POST['service_id_iphone'] ?? null;
 
     $query = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
@@ -302,9 +448,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-iphone'])
     if ($newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
 
         try {
-            $stmt = $conn->prepare("INSERT INTO urządzenia (Id_Urządzenia, Id_Klienta, Id_TypuUrządzenia, Marka, Model, Numer_Seryjny, Opis_problemu) VALUES (:id_device, :id_client, :id_type_device, :mark, :model, :serial_number, :description)");
+            $stmt = $conn->prepare("INSERT INTO urządzenia (Id_Klienta, Id_TypuUrządzenia, Marka, Model, Numer_Seryjny, Opis_problemu) VALUES (:id_client, :id_type_device, :mark, :model, :serial_number, :description)");
 
-            $stmt->bindParam(':id_device', $idDevice);
             $stmt->bindParam(':id_client',$ClientId );
             $stmt->bindParam(':id_type_device', $idTypeDevice);
             $stmt->bindParam(':mark', $Iphone);
@@ -313,13 +458,82 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-iphone'])
             $stmt->bindParam(':description', $newPhoneProblemDesc);
             $stmt->execute();
 
-            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności, Cena_Zlecenia) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
+            $idDevice = $conn->lastInsertId();
+            $fixDesc = '';
 
-            $stmt->bindParam(':id_order', $idOrder);
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności, Cena_Zlecenia) VALUES (:id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
+
             $stmt->bindParam(':id_device',$idDevice );
             $stmt->bindParam(':id_employee', $newIdEmployee);
             $stmt->bindParam(':date_reception', $newDateReception);
-            $stmt->bindParam(':issue_desc', $newPhoneProblemDesc);
+            $stmt->bindParam(':issue_desc', $fixDesc);
+            $stmt->bindParam(':id_status', $idStatus);
+            $stmt->bindParam(':id_service', $idService);
+            $stmt->bindParam(':id_payment', $newIdPayment);
+            $stmt->bindParam(':price', $price);
+            $stmt->execute();
+
+            header('Location: ?page=dashboard');
+            exit();
+
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            echo "An error occurred. Please try again.";
+        }
+
+    } else
+    {
+        echo "Nie udalo sie dodac nowej uslugi (iPhone)";
+    }
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-basket-iphone'])) {
+    $newPhoneModel = trim($_POST['iphone_model']) ?? null;
+    $newPhoneSerialNumber = trim($_POST['iphone_serial_number']) ?? null;
+    $newPhoneProblemDesc = trim($_POST['iphone_problem_description']) ?? null;
+    $newIdEmployee = trim($_POST['iphone_employee_id']) ?? null;
+    $newIdPayment = '2116216192';
+
+    $idTypeDevice = "2116961741";
+    $Iphone = "iPhone";
+
+    $newDateReception = (new DateTime())->format('Y-m-d');
+    $idStatus = "2116961735";
+
+
+    $idService = $_POST['service_id_iphone'] ?? null;
+
+    $query = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
+        FROM usługi 
+        WHERE Id_Usługi = :service_id";
+
+    $res = $conn->prepare($query);
+    $res->bindParam(':service_id', $idService, PDO::PARAM_INT);
+    $res->execute();
+    $serviceId = $res->fetch(PDO::FETCH_ASSOC);
+    $price = $serviceId['Cena'];
+
+    if ($newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
+
+        try {
+            $stmt = $conn->prepare("INSERT INTO urządzenia (Id_Klienta, Id_TypuUrządzenia, Marka, Model, Numer_Seryjny, Opis_problemu) VALUES (:id_client, :id_type_device, :mark, :model, :serial_number, :description)");
+
+            $stmt->bindParam(':id_client',$ClientId );
+            $stmt->bindParam(':id_type_device', $idTypeDevice);
+            $stmt->bindParam(':mark', $Iphone);
+            $stmt->bindParam(':model', $newPhoneModel);
+            $stmt->bindParam(':serial_number', $newPhoneSerialNumber);
+            $stmt->bindParam(':description', $newPhoneProblemDesc);
+            $stmt->execute();
+
+            $idDevice = $conn->lastInsertId();
+            $fixDesc = '';
+
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności, Cena_Zlecenia) VALUES (:id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
+
+            $stmt->bindParam(':id_device',$idDevice );
+            $stmt->bindParam(':id_employee', $newIdEmployee);
+            $stmt->bindParam(':date_reception', $newDateReception);
+            $stmt->bindParam(':issue_desc', $fixDesc);
             $stmt->bindParam(':id_status', $idStatus);
             $stmt->bindParam(':id_service', $idService);
             $stmt->bindParam(':id_payment', $newIdPayment);
@@ -340,19 +554,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-iphone'])
     }
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-macbook'])) {
-    $newPhoneModel = $_POST['macbook_model'] ?? null;
-    $newPhoneSerialNumber = $_POST['macbook_serial_number'] ?? null;
-    $newPhoneProblemDesc = $_POST['macbook_problem_description'] ?? null;
-    $newIdEmployee = $_POST['macbook_employee_id'] ?? null;
-    $newIdPayment = $_POST['macbook_payment_id'] ?? null;
+    $newPhoneModel = trim($_POST['macbook_model']) ?? null;
+    $newPhoneSerialNumber = trim($_POST['macbook_serial_number']) ?? null;
+    $newPhoneProblemDesc = trim($_POST['macbook_problem_description']) ?? null;
+    $newIdEmployee = trim($_POST['macbook_employee_id']) ?? null;
+    $newIdPayment = trim($_POST['macbook_payment_id']) ?? null;
 
-    $idDevice = generateUniqueId();
-    $idOrder = generateUniqueId();
     $idTypeDevice = "2116961744";
     $Iphone = "MacBook";
 
     $newDateReception = (new DateTime())->format('Y-m-d');
-    $idStatus = "2116961730";
+    $idStatus = "2116961735";
+
+    if($newIdPayment != '2116216192')
+    {
+        $idStatus = "2116961733";
+    }
     $idService = $_POST['service_id_macbook'] ?? null;
 
     $query = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
@@ -368,9 +585,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-macbook']
     if ($newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
 
         try {
-            $stmt = $conn->prepare("INSERT INTO urządzenia (Id_Urządzenia, Id_Klienta, Id_TypuUrządzenia, Marka, Model, Numer_Seryjny, Opis_problemu) VALUES (:id_device, :id_client, :id_type_device, :mark, :model, :serial_number, :description)");
+            $stmt = $conn->prepare("INSERT INTO urządzenia (Id_Klienta, Id_TypuUrządzenia, Marka, Model, Numer_Seryjny, Opis_problemu) VALUES (:id_client, :id_type_device, :mark, :model, :serial_number, :description)");
 
-            $stmt->bindParam(':id_device', $idDevice);
             $stmt->bindParam(':id_client',$ClientId );
             $stmt->bindParam(':id_type_device', $idTypeDevice);
             $stmt->bindParam(':mark', $Iphone);
@@ -379,13 +595,81 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-macbook']
             $stmt->bindParam(':description', $newPhoneProblemDesc);
             $stmt->execute();
 
-            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności, Cena_Zlecenia) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
+            $idDevice = $conn->lastInsertId();
+            $fixDesc = '';
 
-            $stmt->bindParam(':id_order', $idOrder);
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności, Cena_Zlecenia) VALUES (:id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
+
             $stmt->bindParam(':id_device',$idDevice );
             $stmt->bindParam(':id_employee', $newIdEmployee);
             $stmt->bindParam(':date_reception', $newDateReception);
-            $stmt->bindParam(':issue_desc', $newPhoneProblemDesc);
+            $stmt->bindParam(':issue_desc', $fixDesc);
+            $stmt->bindParam(':id_status', $idStatus);
+            $stmt->bindParam(':id_service', $idService);
+            $stmt->bindParam(':id_payment', $newIdPayment);
+            $stmt->bindParam(':price', $price);
+            $stmt->execute();
+
+            header('Location: ?page=dashboard');
+            exit();
+
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            echo "An error occurred. Please try again.";
+        }
+
+    } else
+    {
+        echo "Nie udalo sie dodac nowej uslugi (iPhone)";
+    }
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-basket-macbook'])) {
+    $newPhoneModel = trim($_POST['macbook_model']) ?? null;
+    $newPhoneSerialNumber = trim($_POST['macbook_serial_number']) ?? null;
+    $newPhoneProblemDesc = trim($_POST['macbook_problem_description']) ?? null;
+    $newIdEmployee = trim($_POST['macbook_employee_id']) ?? null;
+    $newIdPayment = '2116216192';
+
+    $idTypeDevice = "2116961744";
+    $Iphone = "MacBook";
+
+    $newDateReception = (new DateTime())->format('Y-m-d');
+    $idStatus = "2116961735";
+
+    $idService = $_POST['service_id_macbook'] ?? null;
+
+    $query = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
+        FROM usługi 
+        WHERE Id_Usługi = :service_id";
+
+    $res = $conn->prepare($query);
+    $res->bindParam(':service_id', $idService, PDO::PARAM_INT);
+    $res->execute();
+    $serviceId = $res->fetch(PDO::FETCH_ASSOC);
+    $price = $serviceId['Cena'];
+
+    if ($newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
+
+        try {
+            $stmt = $conn->prepare("INSERT INTO urządzenia (Id_Klienta, Id_TypuUrządzenia, Marka, Model, Numer_Seryjny, Opis_problemu) VALUES (:id_client, :id_type_device, :mark, :model, :serial_number, :description)");
+
+            $stmt->bindParam(':id_client',$ClientId );
+            $stmt->bindParam(':id_type_device', $idTypeDevice);
+            $stmt->bindParam(':mark', $Iphone);
+            $stmt->bindParam(':model', $newPhoneModel);
+            $stmt->bindParam(':serial_number', $newPhoneSerialNumber);
+            $stmt->bindParam(':description', $newPhoneProblemDesc);
+            $stmt->execute();
+
+            $idDevice = $conn->lastInsertId();
+            $fixDesc = '';
+
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności, Cena_Zlecenia) VALUES (:id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
+
+            $stmt->bindParam(':id_device',$idDevice );
+            $stmt->bindParam(':id_employee', $newIdEmployee);
+            $stmt->bindParam(':date_reception', $newDateReception);
+            $stmt->bindParam(':issue_desc', $fixDesc);
             $stmt->bindParam(':id_status', $idStatus);
             $stmt->bindParam(':id_service', $idService);
             $stmt->bindParam(':id_payment', $newIdPayment);
@@ -406,19 +690,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-macbook']
     }
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-ipad'])) {
-    $newPhoneModel = $_POST['ipad_model'] ?? null;
-    $newPhoneSerialNumber = $_POST['ipad_serial_number'] ?? null;
-    $newPhoneProblemDesc = $_POST['ipad_problem_description'] ?? null;
-    $newIdEmployee = $_POST['ipad_employee_id'] ?? null;
-    $newIdPayment = $_POST['ipad_payment_id'] ?? null;
+    $newPhoneModel = trim($_POST['ipad_model']) ?? null;
+    $newPhoneSerialNumber = trim($_POST['ipad_serial_number']) ?? null;
+    $newPhoneProblemDesc = trim($_POST['ipad_problem_description']) ?? null;
+    $newIdEmployee = trim($_POST['ipad_employee_id']) ?? null;
+    $newIdPayment = trim($_POST['ipad_payment_id']) ?? null;
 
-    $idDevice = generateUniqueId();
-    $idOrder = generateUniqueId();
     $idTypeDevice = "2116961745";
     $Iphone = "iPad";
 
     $newDateReception = (new DateTime())->format('Y-m-d');
-    $idStatus = "2116961730";
+    $idStatus = "2116961735";
+
+    if($newIdPayment != '2116216192')
+    {
+        $idStatus = "2116961733";
+    }
     $idService = $_POST['service_id_ipad'] ?? null;
 
     $query = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
@@ -434,9 +721,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-ipad'])) 
     if ($newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
 
         try {
-            $stmt = $conn->prepare("INSERT INTO urządzenia (Id_Urządzenia, Id_Klienta, Id_TypuUrządzenia, Marka, Model, Numer_Seryjny, Opis_problemu) VALUES (:id_device, :id_client, :id_type_device, :mark, :model, :serial_number, :description)");
+            $stmt = $conn->prepare("INSERT INTO urządzenia (Id_Klienta, Id_TypuUrządzenia, Marka, Model, Numer_Seryjny, Opis_problemu) VALUES (:id_client, :id_type_device, :mark, :model, :serial_number, :description)");
 
-            $stmt->bindParam(':id_device', $idDevice);
             $stmt->bindParam(':id_client',$ClientId );
             $stmt->bindParam(':id_type_device', $idTypeDevice);
             $stmt->bindParam(':mark', $Iphone);
@@ -445,13 +731,81 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-ipad'])) 
             $stmt->bindParam(':description', $newPhoneProblemDesc);
             $stmt->execute();
 
-            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności, Cena_Zlecenia) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
+            $idDevice = $conn->lastInsertId();
+            $fixDesc = '';
 
-            $stmt->bindParam(':id_order', $idOrder);
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności, Cena_Zlecenia) VALUES (:id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
+
             $stmt->bindParam(':id_device',$idDevice );
             $stmt->bindParam(':id_employee', $newIdEmployee);
             $stmt->bindParam(':date_reception', $newDateReception);
-            $stmt->bindParam(':issue_desc', $newPhoneProblemDesc);
+            $stmt->bindParam(':issue_desc', $fixDesc);
+            $stmt->bindParam(':id_status', $idStatus);
+            $stmt->bindParam(':id_service', $idService);
+            $stmt->bindParam(':id_payment', $newIdPayment);
+            $stmt->bindParam(':price', $price);
+            $stmt->execute();
+
+            header('Location: ?page=dashboard');
+            exit();
+
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            echo "An error occurred. Please try again.";
+        }
+
+    } else
+    {
+        echo "Nie udalo sie dodac nowej uslugi (iPad)";
+    }
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-basket-ipad'])) {
+    $newPhoneModel = trim($_POST['ipad_model']) ?? null;
+    $newPhoneSerialNumber = trim($_POST['ipad_serial_number']) ?? null;
+    $newPhoneProblemDesc = trim($_POST['ipad_problem_description']) ?? null;
+    $newIdEmployee = trim($_POST['ipad_employee_id']) ?? null;
+    $newIdPayment = '2116216192';
+
+    $idTypeDevice = "2116961745";
+    $Iphone = "iPad";
+
+    $newDateReception = (new DateTime())->format('Y-m-d');
+    $idStatus = "2116961735";
+
+    $idService = $_POST['service_id_ipad'] ?? null;
+
+    $query = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
+        FROM usługi 
+        WHERE Id_Usługi = :service_id";
+
+    $res = $conn->prepare($query);
+    $res->bindParam(':service_id', $idService, PDO::PARAM_INT);
+    $res->execute();
+    $serviceId = $res->fetch(PDO::FETCH_ASSOC);
+    $price = $serviceId['Cena'];
+
+    if ($newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
+
+        try {
+            $stmt = $conn->prepare("INSERT INTO urządzenia (Id_Klienta, Id_TypuUrządzenia, Marka, Model, Numer_Seryjny, Opis_problemu) VALUES (:id_client, :id_type_device, :mark, :model, :serial_number, :description)");
+
+            $stmt->bindParam(':id_client',$ClientId );
+            $stmt->bindParam(':id_type_device', $idTypeDevice);
+            $stmt->bindParam(':mark', $Iphone);
+            $stmt->bindParam(':model', $newPhoneModel);
+            $stmt->bindParam(':serial_number', $newPhoneSerialNumber);
+            $stmt->bindParam(':description', $newPhoneProblemDesc);
+            $stmt->execute();
+
+            $idDevice = $conn->lastInsertId();
+            $fixDesc = '';
+
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności, Cena_Zlecenia) VALUES (:id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
+
+            $stmt->bindParam(':id_device',$idDevice );
+            $stmt->bindParam(':id_employee', $newIdEmployee);
+            $stmt->bindParam(':date_reception', $newDateReception);
+            $stmt->bindParam(':issue_desc', $fixDesc);
             $stmt->bindParam(':id_status', $idStatus);
             $stmt->bindParam(':id_service', $idService);
             $stmt->bindParam(':id_payment', $newIdPayment);
@@ -472,20 +826,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-ipad'])) 
     }
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])) {
-    $newPhoneMark = $_POST['tablet_mark'] ?? null;
-    $newPhoneModel = $_POST['tablet_model'] ?? null;
-    $newPhoneSerialNumber = $_POST['tablet_serial_number'] ?? null;
-    $newPhoneProblemDesc = $_POST['tablet_problem_description'] ?? null;
-    $newIdEmployee = $_POST['employee_id_tablet'] ?? null;
-    $newIdPayment = $_POST['payment_id_tablet'] ?? null;
+    $newPhoneMark = trim($_POST['tablet_mark']) ?? null;
+    $newPhoneModel = trim($_POST['tablet_model']) ?? null;
+    $newPhoneSerialNumber = trim($_POST['tablet_serial_number']) ?? null;
+    $newPhoneProblemDesc = trim($_POST['tablet_problem_description']) ?? null;
+    $newIdEmployee = trim($_POST['employee_id_tablet']) ?? null;
+    $newIdPayment = trim($_POST['payment_id_tablet']) ?? null;
 
-
-    $idDevice = generateUniqueId();
-    $idOrder = generateUniqueId();
     $idTypeDevice = "2116961746";
 
     $newDateReception = (new DateTime())->format('Y-m-d');
-    $idStatus = "2116961730";
+    $idStatus = "2116961735";
+
+    if($newIdPayment != '2116216192')
+    {
+        $idStatus = "2116961733";
+    }
     $idService = $_POST['service_id_tablet'] ?? null;
 
     $query = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
@@ -501,9 +857,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
     if ($newPhoneMark &&  $newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
 
         try {
-            $stmt = $conn->prepare("INSERT INTO urządzenia (Id_Urządzenia, Id_Klienta, Id_TypuUrządzenia, Marka, Model, Numer_Seryjny, Opis_problemu) VALUES (:id_device, :id_client, :id_type_device, :mark, :model, :serial_number, :description)");
+            $stmt = $conn->prepare("INSERT INTO urządzenia (Id_Klienta, Id_TypuUrządzenia, Marka, Model, Numer_Seryjny, Opis_problemu) VALUES (:id_client, :id_type_device, :mark, :model, :serial_number, :description)");
 
-            $stmt->bindParam(':id_device', $idDevice);
             $stmt->bindParam(':id_client',$ClientId );
             $stmt->bindParam(':id_type_device', $idTypeDevice);
             $stmt->bindParam(':mark', $newPhoneMark);
@@ -512,13 +867,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
             $stmt->bindParam(':description', $newPhoneProblemDesc);
             $stmt->execute();
 
-            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Zlecenia, Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności, Cena_Zlecenia) VALUES (:id_order, :id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
+            $idDevice = $conn->lastInsertId();
+            $fixDesc = '';
 
-            $stmt->bindParam(':id_order', $idOrder);
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności, Cena_Zlecenia) VALUES (:id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
+
             $stmt->bindParam(':id_device',$idDevice );
             $stmt->bindParam(':id_employee', $newIdEmployee);
             $stmt->bindParam(':date_reception', $newDateReception);
-            $stmt->bindParam(':issue_desc', $newPhoneProblemDesc);
+            $stmt->bindParam(':issue_desc', $fixDesc);
             $stmt->bindParam(':id_status', $idStatus);
             $stmt->bindParam(':id_service', $idService);
             $stmt->bindParam(':id_payment', $newIdPayment);
@@ -538,9 +895,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
         echo "Nie udalo sie dodac nowej uslugi (Tablet)";
     }
 }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-basket-tablet'])) {
+    $newPhoneMark = trim($_POST['tablet_mark']) ?? null;
+    $newPhoneModel = trim($_POST['tablet_model']) ?? null;
+    $newPhoneSerialNumber = trim($_POST['tablet_serial_number']) ?? null;
+    $newPhoneProblemDesc = trim($_POST['tablet_problem_description']) ?? null;
+    $newIdEmployee = trim($_POST['employee_id_tablet']) ?? null;
+    $newIdPayment = '2116216192';
 
+    $idTypeDevice = "2116961746";
 
+    $newDateReception = (new DateTime())->format('Y-m-d');
+    $idStatus = "2116961735";
 
+    $idService = $_POST['service_id_tablet'] ?? null;
+
+    $query = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
+        FROM usługi 
+        WHERE Id_Usługi = :service_id";
+
+    $res = $conn->prepare($query);
+    $res->bindParam(':service_id', $idService, PDO::PARAM_INT);
+    $res->execute();
+    $serviceId = $res->fetch(PDO::FETCH_ASSOC);
+    $price = $serviceId['Cena'];
+
+    if ($newPhoneMark &&  $newPhoneModel && $newPhoneSerialNumber && $newPhoneProblemDesc) {
+
+        try {
+            $stmt = $conn->prepare("INSERT INTO urządzenia (Id_Klienta, Id_TypuUrządzenia, Marka, Model, Numer_Seryjny, Opis_problemu) VALUES (:id_client, :id_type_device, :mark, :model, :serial_number, :description)");
+
+            $stmt->bindParam(':id_client',$ClientId );
+            $stmt->bindParam(':id_type_device', $idTypeDevice);
+            $stmt->bindParam(':mark', $newPhoneMark);
+            $stmt->bindParam(':model', $newPhoneModel);
+            $stmt->bindParam(':serial_number', $newPhoneSerialNumber);
+            $stmt->bindParam(':description', $newPhoneProblemDesc);
+            $stmt->execute();
+
+            $idDevice = $conn->lastInsertId();
+            $fixDesc = '';
+
+            $stmt = $conn->prepare("INSERT INTO zlecenia (Id_Urządzenia, Id_Pracownika, Data_Przyjęcia, Opis_Problemu, Id_Statusu, Id_Usługi, Id_Płatności, Cena_Zlecenia) VALUES (:id_device, :id_employee, :date_reception, :issue_desc, :id_status, :id_service, :id_payment, :price)");
+
+            $stmt->bindParam(':id_device',$idDevice );
+            $stmt->bindParam(':id_employee', $newIdEmployee);
+            $stmt->bindParam(':date_reception', $newDateReception);
+            $stmt->bindParam(':issue_desc', $fixDesc);
+            $stmt->bindParam(':id_status', $idStatus);
+            $stmt->bindParam(':id_service', $idService);
+            $stmt->bindParam(':id_payment', $newIdPayment);
+            $stmt->bindParam(':price', $price);
+            $stmt->execute();
+
+            header('Location: ?page=dashboard');
+            exit();
+
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            echo "An error occurred. Please try again.";
+        }
+
+    } else
+    {
+        echo "Nie udalo sie dodac nowej uslugi (Tablet)";
+    }
+}
 ?>
 
 
@@ -654,7 +1074,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                             </div>
                             <div class="page-service-add-service-data">
                                 <h5>Numer Seryjny</h5>
-                                <input type="text" name="phone_serial_number" placeholder="Numer Seryjny" required>
+                                <input type="number" name="phone_serial_number" placeholder="Numer Seryjny" required>
                             </div>
                             <div class="page-service-add-service-data">
                                 <h5>Opis problemu</h5>
@@ -679,7 +1099,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" name="add-service-phone" class="page-service-add-service-data-button">Złóż zamówienie</button>
+                        <div class="page-service-add-service-buttons">
+                            <button type="submit" name="add-service-phone" class="page-service-add-service-data-button1">Złóż zamówienie</button>
+                            <button type="submit" name="add-basket-phone" class="page-service-add-service-data-button2">Dodaj do Koszyka</button>
+                        </div>
                     </form>
                 `;
             }
@@ -700,7 +1123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                             </div>
                             <div class="page-service-add-service-data">
                                 <h5>Numer Seryjny</h5>
-                                <input type="text" name="ipad_serial_number" placeholder="Numer Seryjny" required>
+                                <input type="number" name="ipad_serial_number" placeholder="Numer Seryjny" required>
                             </div>
                             <div class="page-service-add-service-data">
                                 <h5>Opis problemu</h5>
@@ -725,7 +1148,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" name="add-service-ipad" class="page-service-add-service-data-button">Złóż zamówienie</button>
+                        <div class="page-service-add-service-buttons">
+                            <button type="submit" name="add-service-ipad" class="page-service-add-service-data-button1">Złóż zamówienie</button>
+                            <button type="submit" name="add-basket-ipad" class="page-service-add-service-data-button2">Dodaj do Koszyka</button>
+                        </div>
                     </form>
                 `;
             }
@@ -750,7 +1176,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                             </div>
                             <div class="page-service-add-service-data">
                                 <h5>Numer Seryjny</h5>
-                                <input type="text" name="tablet_serial_number" placeholder="Numer Seryjny" required>
+                                <input type="number" name="tablet_serial_number" placeholder="Numer Seryjny" required>
                             </div>
                             <div class="page-service-add-service-data">
                                 <h5>Opis problemu</h5>
@@ -775,7 +1201,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" name="add-service-tablet" class="page-service-add-service-data-button">Złóż zamówienie</button>
+                        <div class="page-service-add-service-buttons">
+                            <button type="submit" name="add-service-tablet" class="page-service-add-service-data-button1">Złóż zamówienie</button>
+                            <button type="submit" name="add-basket-tablet" class="page-service-add-service-data-button2">Dodaj do Koszyka</button>
+                        </div>
                     </form>
                 `;
             }
@@ -800,7 +1229,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                             </div>
                             <div class="page-service-add-service-data">
                                 <h5>Numer Seryjny</h5>
-                                <input type="text" name="laptop_serial_number" placeholder="Numer Seryjny" required>
+                                <input type="number" name="laptop_serial_number" placeholder="Numer Seryjny" required>
                             </div>
                             <div class="page-service-add-service-data">
                                 <h5>Opis problemu</h5>
@@ -825,7 +1254,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" name="add-service-laptop" class="page-service-add-service-data-button">Złóż zamówienie</button>
+                        <div class="page-service-add-service-buttons">
+                            <button type="submit" name="add-service-laptop" class="page-service-add-service-data-button1">Złóż zamówienie</button>
+                            <button type="submit" name="add-basket-laptop" class="page-service-add-service-data-button2">Dodaj do Koszyka</button>
+                        </div>
                     </form>
                 `;
             }
@@ -846,7 +1278,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                             </div>
                             <div class="page-service-add-service-data">
                                 <h5>Numer Seryjny</h5>
-                                <input type="text" name="macbook_serial_number" placeholder="Numer Seryjny" required>
+                                <input type="number" name="macbook_serial_number" placeholder="Numer Seryjny" required>
                             </div>
                             <div class="page-service-add-service-data">
                                 <h5>Opis problemu</h5>
@@ -871,7 +1303,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" name="add-service-macbook" class="page-service-add-service-data-button">Złóż zamówienie</button>
+                        <div class="page-service-add-service-buttons">
+                            <button type="submit" name="add-service-macbook" class="page-service-add-service-data-button1">Złóż zamówienie</button>
+                            <button type="submit" name="add-basket-macbook" class="page-service-add-service-data-button2">Dodaj do Koszyka</button>
+                        </div>
                     </form>
                 `;
             }
@@ -892,7 +1327,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                             </div>
                             <div class="page-service-add-service-data">
                                 <h5>Numer Seryjny</h5>
-                                <input type="text" name="iphone_serial_number" placeholder="Numer Seryjny" required>
+                                <input type="number" name="iphone_serial_number" placeholder="Numer Seryjny" required>
                             </div>
                             <div class="page-service-add-service-data">
                                 <h5>Opis problemu</h5>
@@ -917,7 +1352,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-service-tablet'])
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" name="add-service-iphone" class="page-service-add-service-data-button">Złóż zamówienie</button>
+                        <div class="page-service-add-service-buttons">
+                            <button type="submit" name="add-service-iphone" class="page-service-add-service-data-button1">Złóż zamówienie</button>
+                            <button type="submit" name="add-basket-iphone" class="page-service-add-service-data-button2">Dodaj do Koszyka</button>
+                        </div>
                     </form>
                 `;
             }

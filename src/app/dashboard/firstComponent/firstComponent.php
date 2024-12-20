@@ -59,7 +59,6 @@ $sql = "
         serv.Nazwa AS Nazwa_Usługi,
         serv.Opis AS Opis_Usługi,
         serv.Cena AS Cena_Usługi
-        
     FROM zlecenia z
     INNER JOIN urządzenia u ON z.Id_Urządzenia = u.Id_Urządzenia
     INNER JOIN typurządzenia tu ON u.Id_TypuUrządzenia = tu.Id_TypuUrządzenia
@@ -67,13 +66,64 @@ $sql = "
     INNER JOIN status s ON z.Id_Statusu = s.Id_Statusu
     INNER JOIN pracownicy p ON z.Id_Pracownika = p.Id_Pracownika
     INNER JOIN płatność x ON z.Id_Płatności = x.Id_Płatności
-    WHERE u.Id_Klienta = :id_klienta
-    ORDER BY z.Data_Przyjęcia DESC;
+    WHERE u.Id_Klienta = :id_klienta 
+      AND z.Id_Statusu != :id_statusu
+    ORDER BY z.Id_Zlecenia DESC;
 ";
+
 $stmt = $conn->prepare($sql);
+$StatusId = 2116961735;
 $stmt->bindParam(':id_klienta', $ClientId, PDO::PARAM_INT);
+$stmt->bindParam(':id_statusu', $StatusId, PDO::PARAM_INT);
 $stmt->execute();
 $AllOrdersFromClient = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$sql = "
+    SELECT 
+        z.Id_Zlecenia,
+        z.Id_Urządzenia,
+        z.Id_Pracownika,
+        z.Data_Przyjęcia,
+        z.Opis_Problemu AS Opis_Naprawy,
+        z.Id_Statusu,
+        s.Nazwa AS Nazwa_Statusu,
+        z.Data_Zakończenia,
+        z.Cena_Zlecenia,
+        z.Id_Usługi,
+        u.Id_Klienta,
+        u.Id_TypuUrządzenia,
+        u.Marka,
+        u.Model,
+        u.Opis_problemu AS Opis_Problemu,
+        u.Numer_Seryjny,
+        p.Imie AS Imie_Pracownika,
+        p.Nazwisko AS Nazwisko_Pracownika,
+        p.Stanowisko AS Stanowisko_Pracownika,
+        z.Id_Płatności,
+        x.Nazwa_Płatności,
+        tu.Nazwa AS Nazwa_TypuUrządzenia,
+        serv.Nazwa AS Nazwa_Usługi,
+        serv.Opis AS Opis_Usługi,
+        serv.Cena AS Cena_Usługi
+    FROM zlecenia z
+    INNER JOIN urządzenia u ON z.Id_Urządzenia = u.Id_Urządzenia
+    INNER JOIN typurządzenia tu ON u.Id_TypuUrządzenia = tu.Id_TypuUrządzenia
+    INNER JOIN usługi serv ON z.Id_Usługi = serv.Id_Usługi
+    INNER JOIN status s ON z.Id_Statusu = s.Id_Statusu
+    INNER JOIN pracownicy p ON z.Id_Pracownika = p.Id_Pracownika
+    INNER JOIN płatność x ON z.Id_Płatności = x.Id_Płatności
+    WHERE u.Id_Klienta = :id_klienta 
+      AND z.Id_Statusu = :id_statusu
+    ORDER BY z.Id_Zlecenia DESC;
+";
+
+$stmt = $conn->prepare($sql);
+$StatusId = 2116961735;
+$stmt->bindParam(':id_klienta', $ClientId, PDO::PARAM_INT);
+$stmt->bindParam(':id_statusu', $StatusId, PDO::PARAM_INT);
+$stmt->execute();
+$AllBasketFromClient = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['currentUserId'])) {
     $CurrentUser = (int)$_POST['currentUserId'];
@@ -111,7 +161,6 @@ if ($isAdmin) {
             serv.Cena AS Cena_Usługi,
             k.Imie AS Imie_Uzytkownika, 
             k.Nazwisko AS Nazwisko_Uzytkownika 
-        
         FROM zlecenia z 
         INNER JOIN urządzenia u ON z.Id_Urządzenia = u.Id_Urządzenia 
         INNER JOIN klienci k ON u.Id_Klienta = k.Id_Klienta 
@@ -119,32 +168,33 @@ if ($isAdmin) {
         INNER JOIN usługi serv ON z.Id_Usługi = serv.Id_Usługi 
         INNER JOIN status s ON z.Id_Statusu = s.Id_Statusu 
         INNER JOIN pracownicy p ON z.Id_Pracownika = p.Id_Pracownika 
-        INNER JOIN płatność x ON z.Id_Płatności = x.Id_Płatności";
+        INNER JOIN płatność x ON z.Id_Płatności = x.Id_Płatności
+        WHERE z.Id_Statusu != :id_statusu
+    ";
 
-    if (!empty($CurrentUser))
-    {
-        if($section === 'clientOrder')
-        {
-            $sql .= " WHERE u.Id_Klienta = :currentUser";
-        }
-        else if($section === 'employeeOrder')
-        {
-            $sql .= " WHERE z.Id_Pracownika = :currentUser";
+    if (!empty($CurrentUser)) {
+        if ($section === 'clientOrder') {
+            $sql .= " AND u.Id_Klienta = :currentUser";
+        } elseif ($section === 'employeeOrder') {
+            $sql .= " AND z.Id_Pracownika = :currentUser";
         }
     }
 
-    $sql .= " ORDER BY z.Data_Przyjęcia DESC";
+    $sql .= " ORDER BY z.Id_Zlecenia DESC";
 
-    $stmt = $conn->prepare($sql);
+    $stmt = $conn->prepare($sql); // Ensure $pdo is your PDO connection object
+    $StatusId = '2116961735';
 
-    if (!empty($CurrentUser))
-    {
+    $stmt->bindParam(':id_statusu', $StatusId, PDO::PARAM_INT);
+
+    if (!empty($CurrentUser)) {
         $stmt->bindParam(':currentUser', $CurrentUser, PDO::PARAM_INT);
     }
 
     $stmt->execute();
     $AllOrders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
 
 //if($isAdmin)
 //{
@@ -250,8 +300,8 @@ if ($ContactId) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
-    $newFirstname = $_POST['firstname'] ?? null;
-    $newLastname = $_POST['lastname'] ?? null;
+    $newFirstname = trim($_POST['firstname']) ?? null;
+    $newLastname = trim($_POST['lastname']) ?? null;
 
     if ($LoginId && $newFirstname && $newLastname) {
         $stmt = $conn->prepare("UPDATE klienci SET Imie = ?, Nazwisko = ? WHERE Id_Logowania  = ?");
@@ -266,8 +316,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
     }
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_contact'])) {
-    $newPhoneNumber = $_POST['phone_number'] ?? null;
-    $newEmail= $_POST['email'] ?? null;
+    $newPhoneNumber = trim($_POST['phone_number']) ?? null;
+    $newEmail= trim($_POST['email']) ?? null;
 
     if ($LoginId && $newPhoneNumber && $newEmail) {
         $stmt = $conn->prepare("UPDATE kontakty SET Email = ?, NumerTelefonu = ? WHERE Id_Kontaktu  = ?");
@@ -283,10 +333,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_contact'])) {
     }
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_address'])) {
-    $newCity = $_POST['city'] ?? null;
-    $newStreet = $_POST['street'] ?? null;
-    $newPostCode = $_POST['postcode'] ?? null;
-    $newHouseNumber = $_POST['house_number'] ?? null;
+    $newCity = trim($_POST['city']) ?? null;
+    $newStreet = trim($_POST['street']) ?? null;
+    $newPostCode = trim($_POST['postcode']) ?? null;
+    $newHouseNumber = trim($_POST['house_number']) ?? null;
 
     if ($LoginId && $newCity && $newStreet && $newPostCode && $newHouseNumber) {
         $stmt = $conn->prepare("UPDATE adresy SET Ulica = ?, Numer_Domu = ?, Kod_Pocztowy = ?, Miasto = ? WHERE Id_Adresu  = ?");
@@ -297,9 +347,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_address'])) {
     }
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_password'])) {
-    $newCurrentPassword = $_POST['current_password'] ?? null;
-    $newPassword = $_POST['new_password'] ?? null;
-    $repeatNewPassword = $_POST['repeat_new_password'] ?? null;
+    $newCurrentPassword = trim($_POST['current_password']) ?? null;
+    $newPassword = trim($_POST['new_password']) ?? null;
+    $repeatNewPassword = trim($_POST['repeat_new_password']) ?? null;
 
     $stmt = $conn->prepare("SELECT Haslo FROM logowanie WHERE Id_Logowania = ?");
     $stmt->execute([$LoginId]);
@@ -322,51 +372,111 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_password'])) {
     }
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_order'])) {
-    $OrderId = $_POST['delete_order_id'] ?? null;
-    $OrderNameIdStatus = $_POST['delete_order_id_status'] ?? null;
-    $OrderNameStatus = $_POST['delete_order_name_status'] ?? null;
+    $OrderId = trim($_POST['delete_order_id']) ?? null;
+    $OrderNameIdStatus = trim($_POST['delete_order_id_status']) ?? null;
+    $OrderNameStatus = trim($_POST['delete_order_name_status']) ?? null;
 
-    if($OrderNameStatus !== 'Nowe')
-    {
-        return;
-    }
-    else if ($OrderId && $OrderNameIdStatus )
+    if (($OrderNameStatus == 'Nowe' ||  $OrderNameStatus == 'Zaplacone')  && $OrderId && $OrderNameIdStatus )
     {
         $newStatusId = "2116961734";
         $stmt = $conn->prepare("UPDATE zlecenia SET Id_Statusu = ? WHERE Id_Zlecenia = ?");
         $stmt->execute([$newStatusId, $OrderId]);
-    } else
-    {
-        echo "Nie udało się zmienić statusu zamówienia na anulowane";
     }
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
-    $newStatusId = $_POST['edit-order-status-id'] ?? null;
-    $newEmployeeId = $_POST['edit-order-employee-id'] ?? null;
-    $newServiceId = $_POST['edit-order-service-id'] ?? null;
-    $newDateCompletion = $_POST['edit-order-completion-date'] ?? null;
-    $newDateAcceptance = $_POST['edit-order-acceptance-date'] ?? null;
-    $newOrderId= $_POST['edit-order-id'] ?? null;
-    $newOrderFixDesc= $_POST['edit-order-fix-description'] ?? null;
-    $newOrderPaymentId= $_POST['edit-order-payment-id'] ?? null;
-    $newOrderPrice= $_POST['edit-order-service-price'] ?? null;
+    $newStatusId = trim($_POST['edit-order-status-id']) ?? null;
+    $newEmployeeId = trim($_POST['edit-order-employee-id']) ?? null;
+    $newServiceId = trim($_POST['edit-order-service-id']) ?? null;
+    $newDateCompletion = trim($_POST['edit-order-completion-date']) ?? null;
+    $newDateAcceptance = trim($_POST['edit-order-acceptance-date']) ?? null;
+    $newOrderId= trim($_POST['edit-order-id']) ?? null;
+    $newOrderFixDesc= trim($_POST['edit-order-fix-description']) ?? null;
+    $newOrderPaymentId= trim($_POST['edit-order-payment-id']) ?? null;
+    $newOrderPrice= trim($_POST['edit-order-service-price']) ?? null;
 
-    if ($newStatusId && $newDateCompletion && $newOrderId) {
+
+    if ($newOrderId && $newDateCompletion) {
         $stmt = $conn->prepare("UPDATE zlecenia SET Id_Statusu = ?, Data_Zakończenia = ?, Opis_Problemu = ?, Id_Pracownika = ?, Id_Usługi = ?, Id_Płatności = ?, Data_Przyjęcia = ?, Cena_Zlecenia = ? WHERE Id_Zlecenia  = ?");
         $stmt->execute([$newStatusId, $newDateCompletion, $newOrderFixDesc, $newEmployeeId, $newServiceId, $newOrderPaymentId, $newDateAcceptance, $newOrderPrice, $newOrderId]);
-
-    } else {
+    }
+    else if($newOrderId )
+    {
+        $stmt = $conn->prepare("UPDATE zlecenia SET Id_Statusu = ?, Opis_Problemu = ?, Id_Pracownika = ?, Id_Usługi = ?, Id_Płatności = ?, Data_Przyjęcia = ?, Cena_Zlecenia = ? WHERE Id_Zlecenia  = ?");
+        $stmt->execute([$newStatusId, $newOrderFixDesc, $newEmployeeId, $newServiceId, $newOrderPaymentId, $newDateAcceptance, $newOrderPrice, $newOrderId]);
+    }
+    else {
         echo "Nie udalo sie zmienic zamowienia";
     }
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-basket'])) {
+
+    $newOrderMark= trim($_POST['basket_mark']) ?? null;
+    $newOrderModel= trim($_POST['basket_model']) ?? null;
+    $newOrderSerialNumber= trim($_POST['basket_serial_number']) ?? null;
+    $newOrderIssueDesc= trim($_POST['basket_issue_desc']) ?? null;
+    $newServiceId = trim($_POST['basket_service_id']) ?? null;
+    $newEmployeeId = trim($_POST['basket_employee_id']) ?? null;
+    $newOrderPaymentId= trim($_POST['basket_payment_id']) ?? null;
+    $newOrderBasketId = trim($_POST['basket_id']) ?? null;
+    $newOrderDeviceId = trim($_POST['basket_device_id']) ?? null;
+
+    $newStatusId = '';
+    if($newOrderPaymentId == '2116216192')
+    {
+//        brak
+        $newStatusId = '2116961735';
+    }
+    else
+    {
+//        zaplacone
+        $newStatusId = '2116961733';
+    }
+
+
+    $stmt = $conn->prepare("UPDATE urządzenia SET Marka = ?, Model = ?, Numer_Seryjny = ?, Opis_Problemu = ? WHERE Id_Urządzenia  = ?");
+    $stmt->execute([$newOrderMark, $newOrderModel, $newOrderSerialNumber, $newOrderIssueDesc, $newOrderDeviceId]);
+
+    $stmt = $conn->prepare("UPDATE zlecenia SET Id_Statusu = ?, Id_Pracownika = ?, Id_Usługi = ?, Id_Płatności = ? WHERE Id_Zlecenia  = ?");
+    $stmt->execute([$newStatusId, $newEmployeeId, $newServiceId, $newOrderPaymentId, $newOrderBasketId]);
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-basket'])) {
+
+    $newOrderMark= trim($_POST['basket_mark']) ?? null;
+    $newOrderModel= trim($_POST['basket_model']) ?? null;
+    $newOrderSerialNumber= trim($_POST['basket_serial_number']) ?? null;
+    $newOrderIssueDesc= trim($_POST['basket_issue_desc']) ?? null;
+    $newServiceId = trim($_POST['basket_service_id']) ?? null;
+    $newEmployeeId = trim($_POST['basket_employee_id']) ?? null;
+    $newOrderPaymentId= trim($_POST['basket_payment_id']) ?? null;
+    $newOrderBasketId = trim($_POST['basket_id']) ?? null;
+    $newOrderDeviceId = trim($_POST['basket_device_id']) ?? null;
 
 
 
+    $stmt = $conn->prepare("UPDATE urządzenia SET Marka = ?, Model = ?, Numer_Seryjny = ?, Opis_Problemu = ? WHERE Id_Urządzenia  = ?");
+    $stmt->execute([$newOrderMark, $newOrderModel, $newOrderSerialNumber, $newOrderIssueDesc, $newOrderDeviceId]);
+
+    $stmt = $conn->prepare("UPDATE zlecenia SET Id_Statusu = ?, Id_Pracownika = ?, Id_Usługi = ?, Id_Płatności = ? WHERE Id_Zlecenia  = ?");
+    $stmt->execute([$newStatusId, $newEmployeeId, $newServiceId, $newOrderPaymentId, $newOrderBasketId]);
+}
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['basket-delete'])) {
+    $orderId = isset($_POST['order_id']) ? trim($_POST['order_id']) : null;
+    $deviceId = isset($_POST['device_id']) ? trim($_POST['device_id']) : null;
+
+    $stmt = $conn->prepare("DELETE FROM zlecenia WHERE Id_Zlecenia = ?");
+    $stmt->execute([$orderId]);
+
+    $stmt = $conn->prepare("DELETE FROM urządzenia WHERE Id_Urządzenia = ?");
+    $stmt->execute([$deviceId]);
+
+}
 
 ?>
-
 
 <div class="page-dashboard-first-back">
     <img src="/public/background11.jpg" alt="background-image" class="hero-background-image">
@@ -396,6 +506,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
                             <img src="/public/contact_icon.svg" alt="contact-icon" class="page-dashboard-menu-icon"/>
                             <h3>Kontakt</h3>
                         </button>
+                        <button type="submit" name="section" value="basket">
+                            <img src="/public/order-icon3.svg" alt="basket-icon" class="page-dashboard-menu-icon"/>
+                            <h3>Koszyk</h3>
+                        </button>
                         <button type="submit" name="section" value="orders">
                             <img src="/public/order_icon.svg" alt="order-icon" class="page-dashboard-menu-icon"/>
                             <h3>Zamówienia</h3>
@@ -420,13 +534,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
                 </div>
             </div>
             <div class="page-dashboard-content">
-                <div class="page-about-content-top"
-                     style="display: <?php
-                     if ($section === 'orders') {
-                         echo "none";
-                     }
-                     ?>">
-
+                <div class="page-about-content-top" style="display: <?php
+                    if ($section === 'orders') {
+                        echo "none";
+                    }
+                ?>">
                     <?php if ($section === 'profile'): ?>
                         <div class="page-about-content-top-second">
                             <div class="page-about-content-top-second-data">
@@ -504,53 +616,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
                             <img src="/public/edit-icon2.svg" alt="edit-icon"/>
                         </button>
                     <?php endif; ?>
-                    <?php if ($section === 'orders'): ?>
-                        <!--                        <h1 class="page-dashboard-orders-user-title">Lista urządzeń klienta</h1>-->
-                        <!--                        <div class="page-dashboard-orders-user-devices-list">-->
-                        <!--                            --><?php //if (!empty($AllDevicesFromClient)): ?>
-                        <!--                                --><?php //foreach ($AllDevicesFromClient as $device): ?>
-                        <!--                                    <div class="page-dashboard-orders-user-single-device">-->
-                        <!--                                        <h3>--><?php //echo htmlspecialchars($device['Marka'] . " " . $device['Model']); ?><!--</h3>-->
-                        <!--                                    </div>-->
-                        <!--                                --><?php //endforeach; ?>
-                        <!--                            --><?php //else: ?>
-                        <!--                                <p>Brak dodanych urządzeń przez klienta.</p>-->
-                        <!--                            --><?php //endif; ?>
-                        <!--                        </div>-->
+                    <?php if ($section === 'basket'): ?>
+                        <b>Koszyk</b>
+                        <?php if (!empty($AllBasketFromClient)): ?>
+                            <?php foreach ($AllBasketFromClient as $order): ?>
+                                <div class="page-dashboard-basket-single">
+                                    <div class="page-dashboard-orders-user-single-section-title">Usługa:</div>
+                                    <div class="page-dashboard-basket-user-service-name"><?php echo htmlspecialchars($order['Nazwa_Usługi']); ?></div>
+                                    <div class="page-dashboard-orders-user-single-section-title">Cena:</div>
+                                    <div class="page-dashboard-orders-user-single-date-reception-admin"><?php echo htmlspecialchars($order['Cena_Usługi']); ?> zł</div>
+                                    <div class="page-dashboard-orders-user-single-section-title">Urządzenie:</div>
+                                    <div class="page-dashboard-basket-user-device"><?php echo htmlspecialchars($order['Marka'] . " " . $order['Model']); ?></div>
+                                    <div class="page-dashboard-basket-user-order" type="submit" data-order="basket-order" >Pokaż</div>
+                                    <form method="POST">
+                                        <input type="hidden" name="order_id" value="<?php echo htmlspecialchars($order['Id_Zlecenia']); ?>" />
+                                        <input type="hidden" name="device_id" value="<?php echo htmlspecialchars($order['Id_Urządzenia']); ?>" />
+                                        <button class="page-dashboard-basket-user-delete-order" type="submit" name="basket-delete">Usuń</button>
+                                    </form>
+
+                                    <input type="hidden" class="page-dashboard-basket-user-order-id" value="<?php echo htmlspecialchars($order['Id_Zlecenia']); ?>"/>
+                                    <input type="hidden" class="page-dashboard-basket-user-device-id" value="<?php echo htmlspecialchars($order['Id_Urządzenia']); ?>"/>
+                                    <input type="hidden" class="page-dashboard-basket-user-employee-id" value="<?php echo htmlspecialchars($order['Id_Pracownika']); ?>"/>
+                                    <input type="hidden" class="page-dashboard-basket-user-issue-desc" value="<?php echo htmlspecialchars($order['Opis_Problemu']); ?>"/>
+                                    <input type="hidden" class="page-dashboard-basket-user-status-id" value="<?php echo htmlspecialchars($order['Id_Statusu']); ?>"/>
+                                    <input type="hidden" class="page-dashboard-basket-user-service-id" value="<?php echo htmlspecialchars($order['Id_Usługi']); ?>"/>
+                                    <input type="hidden" class="page-dashboard-basket-user-payment-id" value="<?php echo htmlspecialchars($order['Id_Płatności']); ?>"/>
+                                    <input type="hidden" class="page-dashboard-basket-user-mark" value="<?php echo htmlspecialchars($order['Marka']); ?>"/>
+                                    <input type="hidden" class="page-dashboard-basket-user-model" value="<?php echo htmlspecialchars($order['Model']); ?>"/>
+                                    <input type="hidden" class="page-dashboard-basket-user-serial-number" value="<?php echo htmlspecialchars($order['Numer_Seryjny']); ?>"/>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p>Brak zamowien w koszyku</p>
+                        <?php endif; ?>
                     <?php endif; ?>
                     <?php if ($section === 'admin' || $section === 'clientOrder' || $section === 'employeeOrder'): ?>
                         <div class="page-dashboard-admin">
                             <div class="page-dashboard-admin-users">
                                 <h3>Użytkownicy</h3>
-                                <?php if (!empty($AllUsers)): ?>
-                                    <?php foreach ($AllUsers as $users): ?>
-                                        <div class="page-dashboard-admin-single-user">
-<!--                                            <div class="page-dashboard-orders-user-single-section-title">Id: </div>-->
-<!--                                            <div class="page-dashboard-admin-single-user-id" type="submit" data-user="user">--><?php //echo htmlspecialchars($users['Id_Klienta']); ?><!--</div>-->
-                                            <div class="page-dashboard-orders-user-single-section-title">Imie i Nazwisko: </div>
-                                            <div class="page-dashboard-admin-single-user-name" ><?php echo htmlspecialchars($users['Imie'] . " " . $users['Nazwisko']); ?></div>
-                                            <div class="page-dashboard-orders-user-single-show-admin-profile" type="submit" data-user="user" >Profil</div>
-                                            <form method="post">
-                                                <input type="hidden" name="currentUserId" value="<?php echo htmlspecialchars($users['Id_Klienta']); ?>" />
-                                                <button type="submit" name="section" value="clientOrder" class="page-dashboard-orders-user-single-show-orders">
-                                                    Zamówienia
-                                                </button>
-                                            </form>
-<!--                                            <div class="page-dashboard-orders-user-single-show-admin-profile" type="submit" data-user="user" >Edytuj</div>-->
-                                            <input type="hidden" class="page-dashboard-admin-user-id" value="<?php echo htmlspecialchars($users['Id_Klienta']); ?>" />
-                                            <input type="hidden" class="page-dashboard-admin-user-firstname" value="<?php echo htmlspecialchars($users['Imie']); ?>" />
-                                            <input type="hidden" class="page-dashboard-admin-user-lastname" value="<?php echo htmlspecialchars($users['Nazwisko']); ?>" />
-                                            <input type="hidden" class="page-dashboard-admin-user-email" value="<?php echo htmlspecialchars($users['Email']); ?>" />
-                                            <input type="hidden" class="page-dashboard-admin-user-phone" value="<?php echo htmlspecialchars($users['NumerTelefonu']); ?>" />
-                                            <input type="hidden" class="page-dashboard-admin-user-street" value="<?php echo htmlspecialchars($users['Ulica']); ?>" />
-                                            <input type="hidden" class="page-dashboard-admin-user-house-number" value="<?php echo htmlspecialchars($users['Numer_domu']); ?>" />
-                                            <input type="hidden" class="page-dashboard-admin-user-post-code" value="<?php echo htmlspecialchars($users['Kod_Pocztowy']); ?>" />
-                                            <input type="hidden" class="page-dashboard-admin-user-city" value="<?php echo htmlspecialchars($users['Miasto']); ?>" />
-                                        </div>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <p>Brak dodanych urządzeń przez klienta.</p>
-                                <?php endif; ?>
+                                <div class="page-dashboard-admin-users-scroll">
+                                    <?php if (!empty($AllUsers)): ?>
+                                        <?php foreach ($AllUsers as $users): ?>
+                                            <div class="page-dashboard-admin-single-user">
+                                                <!--                                            <div class="page-dashboard-orders-user-single-section-title">Id: </div>-->
+                                                <!--                                            <div class="page-dashboard-admin-single-user-id" type="submit" data-user="user">--><?php //echo htmlspecialchars($users['Id_Klienta']); ?><!--</div>-->
+                                                <div class="page-dashboard-orders-user-single-section-title">Imie i Nazwisko: </div>
+                                                <div class="page-dashboard-admin-single-user-name" ><?php echo htmlspecialchars($users['Imie'] . " " . $users['Nazwisko']); ?></div>
+                                                <div class="page-dashboard-orders-user-single-show-admin-profile" type="submit" data-user="user" >Profil</div>
+                                                <form method="post">
+                                                    <input type="hidden" name="currentUserId" value="<?php echo htmlspecialchars($users['Id_Klienta']); ?>" />
+                                                    <button type="submit" name="section" value="clientOrder" class="page-dashboard-orders-user-single-show-orders">
+                                                        Zamówienia
+                                                    </button>
+                                                </form>
+                                                <!--                                            <div class="page-dashboard-orders-user-single-show-admin-profile" type="submit" data-user="user" >Edytuj</div>-->
+                                                <input type="hidden" class="page-dashboard-admin-user-id" value="<?php echo htmlspecialchars($users['Id_Klienta']); ?>" />
+                                                <input type="hidden" class="page-dashboard-admin-user-firstname" value="<?php echo htmlspecialchars($users['Imie']); ?>" />
+                                                <input type="hidden" class="page-dashboard-admin-user-lastname" value="<?php echo htmlspecialchars($users['Nazwisko']); ?>" />
+                                                <input type="hidden" class="page-dashboard-admin-user-email" value="<?php echo htmlspecialchars($users['Email']); ?>" />
+                                                <input type="hidden" class="page-dashboard-admin-user-phone" value="<?php echo htmlspecialchars($users['NumerTelefonu']); ?>" />
+                                                <input type="hidden" class="page-dashboard-admin-user-street" value="<?php echo htmlspecialchars($users['Ulica']); ?>" />
+                                                <input type="hidden" class="page-dashboard-admin-user-house-number" value="<?php echo htmlspecialchars($users['Numer_domu']); ?>" />
+                                                <input type="hidden" class="page-dashboard-admin-user-post-code" value="<?php echo htmlspecialchars($users['Kod_Pocztowy']); ?>" />
+                                                <input type="hidden" class="page-dashboard-admin-user-city" value="<?php echo htmlspecialchars($users['Miasto']); ?>" />
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <p>Brak zamówień</p>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                             <div class="page-dashboard-admin-center-lines">
                                 <span></span>
@@ -558,36 +692,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
                             </div>
                             <div class="page-dashboard-admin-employees">
                                 <h3>Pracownicy</h3>
-                                <?php if (!empty($AllEmployees)): ?>
-                                    <?php foreach ($AllEmployees as $employee): ?>
-                                        <div class="page-dashboard-admin-single-employee" >
-<!--                                            <div class="page-dashboard-orders-user-single-section-title">Id: </div>-->
-<!--                                            <div class="page-dashboard-admin-single-user-id">--><?php //echo htmlspecialchars($employee['Id_Pracownika']); ?><!--</div>-->
-                                            <div class="page-dashboard-orders-user-single-section-title">Imie i Nazwisko: </div>
-                                            <div class="page-dashboard-admin-single-user-name"><?php echo htmlspecialchars($employee['Imie'] . " " . $employee['Nazwisko']); ?></div>
-                                            <div class="page-dashboard-orders-user-single-show-admin-profile" type="submit" data-user="user">Profil</div>
-                                            <form method="post">
-                                                <input type="hidden" name="currentUserId" value="<?php echo htmlspecialchars($employee['Id_Pracownika']); ?>" />
-                                                <button type="submit" name="section" value="employeeOrder" class="page-dashboard-orders-user-single-show-orders">
-                                                    Zamówienia
-                                                </button>
-                                            </form>
+                                <div class="page-dashboard-admin-users-scroll">
+                                    <?php if (!empty($AllEmployees)): ?>
+                                        <?php foreach ($AllEmployees as $employee): ?>
+                                            <div class="page-dashboard-admin-single-employee" >
+                                                <!--                                            <div class="page-dashboard-orders-user-single-section-title">Id: </div>-->
+                                                <!--                                            <div class="page-dashboard-admin-single-user-id">--><?php //echo htmlspecialchars($employee['Id_Pracownika']); ?><!--</div>-->
+                                                <div class="page-dashboard-orders-user-single-section-title">Imie i Nazwisko: </div>
+                                                <div class="page-dashboard-admin-single-user-name"><?php echo htmlspecialchars($employee['Imie'] . " " . $employee['Nazwisko']); ?></div>
+                                                <div class="page-dashboard-orders-user-single-show-admin-profile" type="submit" data-user="user">Profil</div>
+                                                <form method="post">
+                                                    <input type="hidden" name="currentUserId" value="<?php echo htmlspecialchars($employee['Id_Pracownika']); ?>" />
+                                                    <button type="submit" name="section" value="employeeOrder" class="page-dashboard-orders-user-single-show-orders">
+                                                        Zamówienia
+                                                    </button>
+                                                </form>
 
-                                            <input type="hidden" class="page-dashboard-admin-employee-id" value="<?php echo htmlspecialchars($employee['Id_Pracownika']); ?>" />
-                                            <input type="hidden" class="page-dashboard-admin-employee-firstname" value="<?php echo htmlspecialchars($employee['Imie']); ?>" />
-                                            <input type="hidden" class="page-dashboard-admin-employee-lastname" value="<?php echo htmlspecialchars($employee['Nazwisko']); ?>" />
-                                            <input type="hidden" class="page-dashboard-admin-employee-position" value="<?php echo htmlspecialchars($employee['Stanowisko']); ?>" />
-                                            <input type="hidden" class="page-dashboard-admin-employee-email" value="<?php echo htmlspecialchars($employee['Email']); ?>" />
-                                            <input type="hidden" class="page-dashboard-admin-employee-phone" value="<?php echo htmlspecialchars($employee['NumerTelefonu']); ?>" />
-                                            <input type="hidden" class="page-dashboard-admin-employee-street" value="<?php echo htmlspecialchars($employee['Ulica']); ?>" />
-                                            <input type="hidden" class="page-dashboard-admin-employee-house-number" value="<?php echo htmlspecialchars($employee['Numer_domu']); ?>" />
-                                            <input type="hidden" class="page-dashboard-admin-employee-post-code" value="<?php echo htmlspecialchars($employee['Kod_Pocztowy']); ?>" />
-                                            <input type="hidden" class="page-dashboard-admin-employee-city" value="<?php echo htmlspecialchars($employee['Miasto']); ?>" />
-                                        </div>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <p>Brak dodanych urządzeń przez klienta.</p>
-                                <?php endif; ?>
+                                                <input type="hidden" class="page-dashboard-admin-employee-id" value="<?php echo htmlspecialchars($employee['Id_Pracownika']); ?>" />
+                                                <input type="hidden" class="page-dashboard-admin-employee-firstname" value="<?php echo htmlspecialchars($employee['Imie']); ?>" />
+                                                <input type="hidden" class="page-dashboard-admin-employee-lastname" value="<?php echo htmlspecialchars($employee['Nazwisko']); ?>" />
+                                                <input type="hidden" class="page-dashboard-admin-employee-position" value="<?php echo htmlspecialchars($employee['Stanowisko']); ?>" />
+                                                <input type="hidden" class="page-dashboard-admin-employee-email" value="<?php echo htmlspecialchars($employee['Email']); ?>" />
+                                                <input type="hidden" class="page-dashboard-admin-employee-phone" value="<?php echo htmlspecialchars($employee['NumerTelefonu']); ?>" />
+                                                <input type="hidden" class="page-dashboard-admin-employee-street" value="<?php echo htmlspecialchars($employee['Ulica']); ?>" />
+                                                <input type="hidden" class="page-dashboard-admin-employee-house-number" value="<?php echo htmlspecialchars($employee['Numer_domu']); ?>" />
+                                                <input type="hidden" class="page-dashboard-admin-employee-post-code" value="<?php echo htmlspecialchars($employee['Kod_Pocztowy']); ?>" />
+                                                <input type="hidden" class="page-dashboard-admin-employee-city" value="<?php echo htmlspecialchars($employee['Miasto']); ?>" />
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <p>Brak pracowników</p>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
 
@@ -608,7 +744,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
                             <?php if (!empty($AllOrders)): ?>
                                 <?php foreach ($AllOrders as $order): ?>
                                     <div class="page-dashboard-orders-user-single-order-admin">
-                                        <div class="page-dashboard-orders-user-single-section-title">Id: </div>
+                                        <div class="page-dashboard-orders-user-single-section-title">Zamówienie:</div>
                                         <div class="page-dashboard-orders-user-single-id-admin"><?php echo htmlspecialchars($order['Id_Zlecenia']); ?></div>
                                         <div class="page-dashboard-orders-user-single-section-title">Przyjęcie: </div>
                                         <div class="page-dashboard-orders-user-single-date-reception-admin"><?php echo htmlspecialchars($order['Data_Przyjęcia']); ?></div>
@@ -619,7 +755,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
                                             {
                                                 echo htmlspecialchars($order['Data_Zakończenia']);
                                             }
-                                            else if($order['Nazwa_Statusu'] === 'Anulowane')
+                                            else if($order['Nazwa_Statusu'] === 'Anulowane' || $order['Nazwa_Statusu'] === 'Nie Zaplacone')
                                             {
                                                 echo "Brak";
                                             }
@@ -630,40 +766,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
                                         </div>
                                         <div class="page-dashboard-orders-user-single-section-device-admin"><?php echo htmlspecialchars($order['Marka'] . " " . $order['Model']); ?></div>
                                         <div class="page-dashboard-orders-user-single-show-admin" type="submit" data-order="admin-order" >Pokaż</div>
-                                        <form method="POST">
-                                            <button class="page-dashboard-orders-user-single-delete"
-                                                    type="submit" name="delete_order"
-                                                    style="background-color: <?php
-                                                    // Change background color based on the order's status
-                                                    if ($order['Nazwa_Statusu'] === 'Nowe') {
-                                                        echo "#b10404";  // Red for 'Nowe'
-                                                    } elseif ($order['Nazwa_Statusu'] === 'Ukonczone') {
-                                                        echo "#222222";  // Dark for 'Ukończone'
-                                                    } elseif ($order['Nazwa_Statusu'] === 'Anulowane') {
-                                                        echo "#c8c8c8";  // Light gray for 'Anulowane'
-                                                    } else {
-                                                        echo "#049a52";  // Green for other statuses (Realizacja)
-                                                    }
-                                                    ?>">
+
+
+                                        <?php if ($order['Nazwa_Statusu'] === 'Nowe' || $order['Nazwa_Statusu'] === 'Zaplacone'): ?>
+                                            <form method="POST">
+                                                <button class="page-dashboard-orders-user-single-delete" type="submit" name="delete_order" style="background-color: #b10404">
+                                                    Anuluj
+                                                    <input type="hidden" name="delete_order_id" value="<?php echo htmlspecialchars($order['Id_Zlecenia']); ?>" />
+                                                    <input type="hidden" name="delete_order_name_status" value="<?php echo htmlspecialchars($order['Nazwa_Statusu']); ?>" />
+                                                    <input type="hidden" name="delete_order_id_status" value="<?php echo htmlspecialchars($order['Id_Statusu']); ?>" />
+                                                    <input type="hidden" name="page-dashboard-admin-orders-device-type-id" value="<?php echo htmlspecialchars($order['Id_TypuUrządzenia']); ?>" />
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+                                        <?php if ($order['Nazwa_Statusu'] === 'Nie Zaplacone'): ?>
+                                            <form method="POST">
+                                                <button class="page-dashboard-orders-user-single-delete" style="background-color: #e5e848">
+                                                    Nie Zaplacono
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+                                        <?php if ($order['Nazwa_Statusu'] === 'Ukonczone' || $order['Nazwa_Statusu'] === 'W Trakcie Realizacji' || $order['Nazwa_Statusu'] === 'Anulowane'): ?>
+                                            <div class="page-dashboard-orders-user-single-delete"
+                                                 style="background-color: <?php
+                                                 // Change background color based on the order's status
+                                                 if ($order['Nazwa_Statusu'] === 'Ukonczone') {
+                                                     echo "#222222";  // Dark for 'Ukończone'
+                                                 } elseif ($order['Nazwa_Statusu'] === 'Anulowane') {
+                                                     echo "#c8c8c8";  // Light gray for 'Anulowane'
+                                                 }
+                                                 elseif ($order['Nazwa_Statusu'] === 'W Trakcie Realizacji') {
+                                                     echo "#049a52";  // Light gray for 'Anulowane'
+                                                 }
+                                                 ?>">
 
                                                 <?php
-                                                // Display the status text inside the button
-                                                if ($order['Nazwa_Statusu'] === 'Nowe') {
-                                                    echo "Anuluj";
-                                                } elseif ($order['Nazwa_Statusu'] === 'Ukonczone') {
+                                                if ($order['Nazwa_Statusu'] === 'Ukonczone') {
                                                     echo "Zakończone";
                                                 } elseif ($order['Nazwa_Statusu'] === 'Anulowane') {
                                                     echo "Anulowane";
-                                                } else {
+                                                } elseif ($order['Nazwa_Statusu'] === 'W Trakcie Realizacji') {
                                                     echo "Realizacja";
                                                 }
                                                 ?>
-                                                <input type="hidden" name="delete_order_id" value="<?php echo htmlspecialchars($order['Id_Zlecenia']); ?>" />
-                                                <input type="hidden" name="delete_order_name_status" value="<?php echo htmlspecialchars($order['Nazwa_Statusu']); ?>" />
-                                                <input type="hidden" name="delete_order_id_status" value="<?php echo htmlspecialchars($order['Id_Statusu']); ?>" />
-                                                <input type="hidden" name="page-dashboard-admin-orders-device-type-id" value="<?php echo htmlspecialchars($order['Id_TypuUrządzenia']); ?>" />
-                                            </button>
-                                        </form>
+                                            </div>
+                                        <?php endif; ?>
+
+
+
                                         <input type="hidden" class="page-dashboard-admin-orders-firstname" value="<?php echo htmlspecialchars($order['Imie_Uzytkownika']); ?>"/>
                                         <input type="hidden" class="page-dashboard-admin-orders-lastname" value="<?php echo htmlspecialchars($order['Nazwisko_Uzytkownika']); ?>"/>
                                         <input type="hidden" class="page-dashboard-admin-orders-device-type" value="<?php echo htmlspecialchars($order['Nazwa_TypuUrządzenia']); ?>"/>
@@ -688,14 +838,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
                                     </div>
                                 <?php endforeach; ?>
                             <?php else: ?>
-                                <p>Brak dodanych urządzeń przez klienta.</p>
+                                <p>Brak zamowien wsrod klientow</p>
                             <?php endif; ?>
                         <?php endif; ?>
                         <?php if ($section !== 'admin' && $section !== 'clientOrder' && $section !== 'employeeOrder' ): ?>
                             <?php if (!empty($AllOrdersFromClient)): ?>
                                 <?php foreach ($AllOrdersFromClient as $order): ?>
                                     <div class="page-dashboard-orders-user-single-order">
-                                        <div class="page-dashboard-orders-user-single-section-title">Id: </div>
+                                        <div class="page-dashboard-orders-user-single-section-title">Zamówienie:</div>
                                         <div class="page-dashboard-orders-user-single-id"><?php echo htmlspecialchars($order['Id_Zlecenia']); ?></div>
                                         <div class="page-dashboard-orders-user-single-section-title">Przyjęcie: </div>
                                         <div class="page-dashboard-orders-user-single-date-reception"><?php echo htmlspecialchars($order['Data_Przyjęcia']); ?></div>
@@ -706,7 +856,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
                                             {
                                                 echo htmlspecialchars($order['Data_Zakończenia']);
                                             }
-                                            else if($order['Nazwa_Statusu'] === 'Anulowane')
+                                            else if($order['Nazwa_Statusu'] === 'Anulowane' || $order['Nazwa_Statusu'] === 'Nie Zaplacone')
                                             {
                                                 echo "Brak";
                                             }
@@ -717,39 +867,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
                                         </div>
                                         <div class="page-dashboard-orders-user-single-section-device"><?php echo htmlspecialchars($order['Marka'] . " " . $order['Model']); ?></div>
                                         <div class="page-dashboard-orders-user-single-show" type="submit" data-order="order" >Pokaż</div>
-                                        <form method="POST">
-                                            <button class="page-dashboard-orders-user-single-delete"
-                                                    type="submit" name="delete_order"
+
+                                        <?php if ($order['Nazwa_Statusu'] === 'Nowe' || $order['Nazwa_Statusu'] === 'Zaplacone'): ?>
+                                            <form method="POST">
+                                                <button class="page-dashboard-orders-user-single-delete" type="submit" name="delete_order" style="background-color: #b10404">
+                                                    Anuluj
+                                                    <input type="hidden" name="delete_order_id" value="<?php echo htmlspecialchars($order['Id_Zlecenia']); ?>" />
+                                                    <input type="hidden" name="delete_order_name_status" value="<?php echo htmlspecialchars($order['Nazwa_Statusu']); ?>" />
+                                                    <input type="hidden" name="delete_order_id_status" value="<?php echo htmlspecialchars($order['Id_Statusu']); ?>" />
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+                                        <?php if ($order['Nazwa_Statusu'] === 'Nie Zaplacone'): ?>
+                                            <form method="POST">
+                                                <button class="page-dashboard-orders-user-single-delete" style="background-color: #e5e848">
+                                                    Dokoncz
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+                                        <?php if ($order['Nazwa_Statusu'] === 'Ukonczone' || $order['Nazwa_Statusu'] === 'W Trakcie Realizacji' || $order['Nazwa_Statusu'] === 'Anulowane'): ?>
+                                            <div class="page-dashboard-orders-user-single-delete"
                                                     style="background-color: <?php
                                                     // Change background color based on the order's status
-                                                    if ($order['Nazwa_Statusu'] === 'Nowe') {
-                                                        echo "#b10404";  // Red for 'Nowe'
-                                                    } elseif ($order['Nazwa_Statusu'] === 'Ukonczone') {
+                                                    if ($order['Nazwa_Statusu'] === 'Ukonczone') {
                                                         echo "#222222";  // Dark for 'Ukończone'
                                                     } elseif ($order['Nazwa_Statusu'] === 'Anulowane') {
                                                         echo "#c8c8c8";  // Light gray for 'Anulowane'
-                                                    } else {
-                                                        echo "#049a52";  // Green for other statuses (Realizacja)
+                                                    }
+                                                    elseif ($order['Nazwa_Statusu'] === 'W Trakcie Realizacji') {
+                                                        echo "#049a52";  // Light gray for 'Anulowane'
                                                     }
                                                     ?>">
 
                                                 <?php
-                                                // Display the status text inside the button
-                                                if ($order['Nazwa_Statusu'] === 'Nowe') {
-                                                    echo "Anuluj";
-                                                } elseif ($order['Nazwa_Statusu'] === 'Ukonczone') {
+                                                 if ($order['Nazwa_Statusu'] === 'Ukonczone') {
                                                     echo "Zakończone";
                                                 } elseif ($order['Nazwa_Statusu'] === 'Anulowane') {
                                                     echo "Anulowane";
-                                                } else {
+                                                } elseif ($order['Nazwa_Statusu'] === 'W Trakcie Realizacji') {
                                                     echo "Realizacja";
                                                 }
                                                 ?>
-                                                <input type="hidden" name="delete_order_id" value="<?php echo htmlspecialchars($order['Id_Zlecenia']); ?>" />
-                                                <input type="hidden" name="delete_order_name_status" value="<?php echo htmlspecialchars($order['Nazwa_Statusu']); ?>" />
-                                                <input type="hidden" name="delete_order_id_status" value="<?php echo htmlspecialchars($order['Id_Statusu']); ?>" />
-                                            </button>
-                                        </form>
+                                            </div>
+                                        <?php endif; ?>
+
                                         <input type="hidden" class="page-dashboard-orders-user-single-serial_number" value="<?php echo htmlspecialchars($order['Numer_Seryjny']); ?>"/>
                                         <input type="hidden" class="page-dashboard-orders-user-single-issue_desc" value="<?php echo htmlspecialchars($order['Opis_Problemu']); ?>"/>
                                         <input type="hidden" class="page-dashboard-orders-user-single-status" value="<?php echo htmlspecialchars($order['Nazwa_Statusu']); ?>"/>
@@ -766,7 +927,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
                                     </div>
                                 <?php endforeach; ?>
                             <?php else: ?>
-                                <p>Brak dodanych urządzeń przez klienta.</p>
+                                <p>Brak zamowien klienta</p>
                             <?php endif; ?>
                         <?php endif; ?>
                     </div>
@@ -829,7 +990,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
                                 </div>
                                 <div class="page-dashboard-edit-profile-container-address">
                                     <h5>Kod Pocztowy</h5>
-                                    <input type="text" name= "postcode" placeholder="Postal Code" value=<?php echo ($postcode); ?>>
+                                    <input type="number" name= "postcode" placeholder="Postal Code" value=<?php echo ($postcode); ?>>
                                 </div>
                             </div>
                             <div class="page-about-content-top-first-contact-subsections">
@@ -886,6 +1047,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
         <div id="modal-admin-order" class="modal-admin-order">
             <div class="modal-content-admin-order">
                 <button id="close-modal-admin-order" class="close-modal-admin-order">&times;</button>
+            </div>
+        </div>
+        <div id="modal-basket" class="modal-basket">
+            <div class="modal-content-basket">
+                <button id="close-modal-basket" class="close-modal-basket">&times;</button>
             </div>
         </div>
 
@@ -951,7 +1117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
 <!--                <h2 class="modal-order-details-title">Szczegóły Zamówienia</h2>-->
                 <div class="modal-order-details">
                     <div class="modal-order-detail">
-                        <p>ID Zamówienia:</p>
+                        <p>Numer Zamówienia:</p>
                         <div>${orderId}</div>
                     </div>
                     <div class="modal-order-detail">
@@ -1125,7 +1291,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
                 </div>
                 <form method="post" class="modal-admin-order-details">
                     <div class="modal-admin-order-detail">
-                        <p>ID Zamówienia:</p>
+                        <p>Numer Zamówienia:</p>
                         <div>${orderId}</div>
                     </div>
                     <div class="modal-admin-order-detail">
@@ -1252,7 +1418,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
                 </div>
                 <div class="modal-user-details">
                     <div class="modal-user-detail">
-                        <p>ID:</p>
+                        <p>Numer Użytkownika:</p>
                         <div>${UserId}</div>
                     </div>
                     <div class="modal-user-detail">
@@ -1340,7 +1506,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
                 </div>
                 <div class="modal-employee-details">
                     <div class="modal-employee-detail">
-                        <p>ID:</p>
+                        <p>Numer Pracownika:</p>
                         <div>${EmployeeId}</div>
                     </div>
                     <div class="modal-employee-detail">
@@ -1392,6 +1558,146 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order'])) {
     window.addEventListener('click', (e) => {
         if (e.target === modalUser) {
             closeModalEmployee();
+        }
+    });
+</script>
+
+<!-- Koszyk-->
+
+<script>
+    const modalBasket = document.getElementById('modal-basket');
+    const buttonsBasket = document.querySelectorAll('.page-dashboard-basket-user-order');
+    const closeModalBasketButton = document.getElementById('close-modal-basket');
+
+    function closeModalBasket() {
+        modalBasket.style.display = 'none';
+    }
+
+    buttonsBasket.forEach((button) => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+
+            const orderRow = button.closest('.page-dashboard-basket-single');
+            const BasketId = orderRow.querySelector('.page-dashboard-basket-user-order-id').value;
+            const DeviceId = orderRow.querySelector('.page-dashboard-basket-user-device-id').value;
+            const EmployeeId = orderRow.querySelector('.page-dashboard-basket-user-employee-id').value;
+            const IssueDesc = orderRow.querySelector('.page-dashboard-basket-user-issue-desc').value;
+            const StatusId = orderRow.querySelector('.page-dashboard-basket-user-status-id').value;
+            const ServiceId = orderRow.querySelector('.page-dashboard-basket-user-service-id').value;
+            const PaymentId = orderRow.querySelector('.page-dashboard-basket-user-payment-id').value;
+            const Mark = orderRow.querySelector('.page-dashboard-basket-user-mark').value;
+            const Model = orderRow.querySelector('.page-dashboard-basket-user-model').value;
+            const SerialNumber = orderRow.querySelector('.page-dashboard-basket-user-serial-number').value;
+
+            <?php
+
+            $sql = "SELECT Id_Usługi, Nazwa, Opis, Cena, Id_TypuUrządzenia 
+            FROM usługi";
+            $stmt = $conn->query($sql);
+
+            $service_phone_options = '';
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $service_phone_options .= "<option value='" . htmlspecialchars($row['Id_Usługi']) . "'>" .
+                    htmlspecialchars($row['Opis']) . " - " .
+                    htmlspecialchars($row['Cena']) . " zł" ."</option>";
+            }
+
+            $sql = "SELECT Id_Pracownika, Imie, Nazwisko, Stanowisko FROM pracownicy";
+            $result = $conn->query($sql);
+
+            $options = '';
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $options .= "<option value='" . htmlspecialchars($row['Id_Pracownika']) . "'>" .
+                    htmlspecialchars($row['Imie']) . " " .
+                    htmlspecialchars($row['Nazwisko']) . " - " .
+                    htmlspecialchars($row['Stanowisko']) . "</option>";
+            }
+
+            $sql = "SELECT Id_Płatności, Nazwa_Płatności FROM płatność";
+            $result = $conn->query($sql);
+
+            $payment_options = '';
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $payment_options .= "<option value='" . htmlspecialchars($row['Id_Płatności']) . "'>" .
+                    htmlspecialchars($row['Nazwa_Płatności']);
+            }
+
+            ?>
+
+
+            const modalContent = modalBasket.querySelector('.modal-content-basket');
+            modalContent.innerHTML = `
+                <button id="close-modal-employee" class="close-modal-employee">&times;</button>
+                <div class="model-content-employee-head">
+                    <h3 class="modal-content-employee-title">Szczegóły Zamówienia</h3>
+                </div>
+                <div class="model-content-basket-subtitle">
+                    <img src= "/public/order_icon_black.svg" alt="service-order-icon">
+                    <h2>Serwis Urządzenia</h2>
+                </div>
+                <form method="post">
+                    <div class="page-service-add-service">
+                        <div class="page-basket-data">
+                            <h5>Marka</h5>
+                            <input type="text" name="basket_mark" placeholder="Marka " required value= ${Mark}>
+                        </div>
+                        <div class="page-basket-data">
+                            <h5>Model</h5>
+                            <input type="text" name="basket_model" placeholder="Model" required value= ${Model}>
+                        </div>
+                        <div class="page-basket-data">
+                            <h5>Numer Seryjny</h5>
+                            <input type="number" name="basket_serial_number" placeholder="Numer Seryjny" required value= ${SerialNumber}>
+                        </div>
+                        <div class="page-basket-data">
+                            <h5>Opis Problemu</h5>
+                            <textarea name="basket_issue_desc" placeholder="Opis Problemu" required>${IssueDesc}</textarea>
+                        </div>
+                        <div class="page-basket-data">
+                            <h5>Wybierz usłgugę</h5>
+                            <select name="basket_service_id" required>
+                                <?php echo $service_phone_options; ?>
+                            </select>
+                        </div>
+                        <div class="page-basket-data">
+                            <h5>Wybierz pracownika</h5>
+                            <select name="basket_employee_id" required>
+                                <?php echo $options; ?>
+                            </select>
+                        </div>
+                        <div class="page-basket-data">
+                            <h5>Metoda Płatności</h5>
+                            <select name="basket_payment_id" required>
+                                <?php echo $payment_options; ?>
+                            </select>
+                        </div>
+                        <button type="submit" name="add-basket" class="page-basket-add-order">Złóż zamówienie</button>
+                        <input type="hidden" name="basket_id" value= ${BasketId}>
+                        <input type="hidden" name="basket_device_id" value= ${DeviceId}>
+                    </form>
+                </div>
+            `;
+
+            const selectElementEmployee = modalContent.querySelector('select[name="basket_employee_id"]');
+            selectElementEmployee.value = EmployeeId;
+
+            const selectElementService = modalContent.querySelector('select[name="basket_service_id"]');
+            selectElementService.value = ServiceId;
+
+            const selectElementPayment = modalContent.querySelector('select[name="basket_payment_id"]');
+            selectElementPayment.value = PaymentId;
+
+
+            const closeButton = modalContent.querySelector('.close-modal-employee');
+            closeButton.addEventListener('click', closeModalBasket);
+
+            modalBasket.style.display = 'flex';
+        });
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target === modalUser) {
+            closeModalBasket();
         }
     });
 </script>

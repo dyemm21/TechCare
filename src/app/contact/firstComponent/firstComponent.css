@@ -11,8 +11,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Dopasowanie obrazu */
-    z-index: -1; /* Ustawienie obrazu w tle */
+    object-fit: cover;
+    z-index: -1;
 }
 .page-contact-first-container{
     width: 1536px;
@@ -31,55 +31,7 @@
     border-radius: 20px;
     border: 2px solid #4487fa;
 }
-.page-contact-first-grid {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-.page-contact-first-card {
-    /*background-color: yellow;*/
-    padding: 40px 10px;
-    height: 300px;
-    /*width: 30%;*/
-    transition: transform 0.3s ease;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: center;
-    text-align: center;
-}
 
-.page-contact-first-card:hover {
-    transform: translateY(-5px);
-}
-
-.page-contact-first-icon {
-    width: 60px;
-    height: 60px;
-    background-color: #1063ff;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.page-contact-first-icon img {
-    width: 35px;
-    height: 35px;
-    filter: brightness(0) invert(1);
-}
-
-.page-contact-first-title {
-    font-size: 22px;
-    color: #222;
-}
-
-.page-contact-first-description {
-    font-size: 16px;
-    color: #666;
-}
 @media (max-width: 1536px) {
     .page-contact-first-container{
         width: 1366px;

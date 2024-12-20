@@ -23,8 +23,11 @@
     <link rel="stylesheet" href="/src/app/register/RegisterComponent/RegisterComponent.css">
     <link rel="stylesheet" href="/src/app/settings/SettingsComponent/SettingsComponent.css">
     <link rel="stylesheet" href="/src/app/dashboard/firstComponent/firstComponent.css">
+    <link rel="stylesheet" href="/src/app/contact/firstComponent/contactIcons/contactIcons.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
-<!--    <link rel="stylesheet" href="/contact/style.css">-->
+
+    <!--    <link rel="stylesheet" href="/contact/style.css">-->
 <!--    <link rel="stylesheet" href="/login/style.css">-->
 <!--    <link rel="stylesheet" href="/register/style.css">-->
 <!--    <link rel="stylesheet" href="/services/style.css">-->

@@ -1,9 +1,6 @@
 
 <?php
 require 'db.php';
-function generateUniqueId() {
-    return rand(1, 2147483647);
-}
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -25,12 +22,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $city = trim($_POST['city']);
     $photo = trim($_POST['photo']);
 
-    if (empty($firstname) || empty($lastname) || empty($email) || empty($password) || empty($repeat_password)) {
-        $error = "Please fill in all fields!";
+    if (strlen($firstname) < 2) {
+        $error = "Firstname must have at least 2 characters";
+    } elseif (strlen($lastname) < 2) {
+        $error = "Lastname must have at least 2 characters";
+    } elseif (strlen($password) < 8) {
+        $error = "Password must be at least 8 characters long";
+    } elseif (!preg_match("/^[^\s@]+@[^\s@]+\.[^\s@]+$/", $email)) {
+        $error = "Invalid email address";
+    }
+
+    else if (empty($firstname) || empty($lastname) || empty($email) || empty($password) || empty($repeat_password)) {
+        $error = "Please fill in all fields";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = "Invalid email address!";
+        $error = "Invalid email address";
     } elseif ($password !== $repeat_password) {
-        $error = "Passwords do not match!";
+        $error = "Passwords do not match";
     } else {
         try {
             $stmt = $conn->prepare("SELECT * FROM Logowanie WHERE Email = :email");
@@ -41,33 +48,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             } else {
                 $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
-                $idKontaktu = generateUniqueId();
-                $idAdresu = generateUniqueId();
-                $idLogowania = generateUniqueId();
-                $idKlienta = generateUniqueId();
 
-                $stmt = $conn->prepare("INSERT INTO Kontakty (Email, NumerTelefonu, Id_Kontaktu) VALUES (:email, :phone_number, :id_kontaktu)");
+                $stmt = $conn->prepare("INSERT INTO Kontakty (Email, NumerTelefonu) VALUES (:email, :phone_number)");
                 $stmt->bindParam(':email', $email);
                 $stmt->bindParam(':phone_number', $phoneNumber);
-                $stmt->bindParam(':id_kontaktu', $idKontaktu);
                 $stmt->execute();
 
-                $stmt = $conn->prepare("INSERT INTO Adresy (Ulica, Numer_Domu, Kod_Pocztowy, Miasto, Id_Adresu) VALUES (:street, :house_number, :postal_code, :city, :id_adresu)");
+                $idKontaktu = $conn->lastInsertId();
+
+                $stmt = $conn->prepare("INSERT INTO Adresy (Ulica, Numer_Domu, Kod_Pocztowy, Miasto) VALUES (:street, :house_number, :postal_code, :city)");
                 $stmt->bindParam(':street', $street);
                 $stmt->bindParam(':house_number', $houseNumber);
                 $stmt->bindParam(':postal_code', $postalCode);
                 $stmt->bindParam(':city', $city);
-                $stmt->bindParam(':id_adresu', $idAdresu);
                 $stmt->execute();
 
-                $stmt = $conn->prepare("INSERT INTO Logowanie (Email, Haslo, Id_Logowania) VALUES (:email, :password, :id_logowania)");
+                $idAdresu = $conn->lastInsertId();
+
+                $stmt = $conn->prepare("INSERT INTO Logowanie (Email, Haslo) VALUES (:email, :password)");
                 $stmt->bindParam(':email', $email);
                 $stmt->bindParam(':password', $hashedPassword);
-                $stmt->bindParam(':id_logowania', $idLogowania);
                 $stmt->execute();
 
-                $stmt = $conn->prepare("INSERT INTO Klienci (Id_Klienta,Imie, Nazwisko, Id_Kontaktu, Id_Adresu, Zdjecie, Id_Logowania) VALUES (:id_klienta,:firstname, :lastname, :id_kontaktu, :id_adresu, :photo, :id_logowania)");
-                $stmt->bindParam(':id_klienta', $idKlienta);
+                $idLogowania = $conn->lastInsertId();
+
+                $stmt = $conn->prepare("INSERT INTO Klienci (Imie, Nazwisko, Id_Kontaktu, Id_Adresu, Zdjecie, Id_Logowania) VALUES (:firstname, :lastname, :id_kontaktu, :id_adresu, :photo, :id_logowania)");
                 $stmt->bindParam(':firstname', $firstname);
                 $stmt->bindParam(':lastname', $lastname);
                 $stmt->bindParam(':id_kontaktu', $idKontaktu);
@@ -76,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $stmt->bindParam(':id_logowania', $idLogowania);
                 $stmt->execute();
 
-                $_SESSION['success'] = "Registration successful! Please log in.";
+                $_SESSION['success'] = "Registration successful";
                 header('Location: ?page=login');
                 exit();
             }
@@ -88,23 +93,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 ?>
 
 <div class="register-first-container">
+    <?php if (isset($error)): ?>
+        <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
+    <?php endif; ?>
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="success-message"><?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></div>
+    <?php endif; ?>
     <img src="/public/background5.jpg" alt="background-image" class="hero-background-image">
     <div class="register-first-content">
-        <?php if (isset($error)): ?>
-            <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
-        <?php endif; ?>
-        <?php if (isset($_SESSION['success'])): ?>
-            <div class="success-message"><?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></div>
-        <?php endif; ?>
-
         <form class="register-first-form" action="?page=register" method="POST">
             <h3>Create Your Account</h3>
             <p>Let's Register</p>
-            <input type="text" class="register-first-input" name="firstname" placeholder="Firstname" required />
-            <input type="text" class="register-first-input" name="lastname" placeholder="Lastname" required />
+            <input type="text" class="register-first-input" name="firstname" placeholder="Firstname" required/>
+            <input type="text" class="register-first-input" name="lastname" placeholder="Lastname"  required/>
             <input type="email" class="register-first-input" name="email" placeholder="Email" required />
-            <input type="password" class="register-first-input" name="password" placeholder="Password" required />
-            <input type="password" class="register-first-input" name="repeat_password" placeholder="Repeat Password" required />
+            <input type="password" class="register-first-input" name="password" placeholder="Password" required/>
+            <input type="password" class="register-first-input" name="repeat_password" placeholder="Repeat Password" required/>
             <input type="hidden" class="register-first-input" name="phone_number" value=" "/>
             <input type="hidden" class="register-first-input" name="street"  value=" " />
             <input type="hidden" class="register-first-input" name="house_number"  value=" "/>
@@ -116,3 +120,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </form>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.querySelector('.register-first-form');
+        form.addEventListener('submit', (event) => {
+            const email = form.email.value.trim();
+
+            const errorMessages = document.querySelectorAll('.error-message');
+            errorMessages.forEach(msg => msg.remove());
+
+            else if (!validateEmail(email)) {
+                showError(form.email, "Invalid email address");
+                event.preventDefault();
+            }
+        });
+
+        function showError(input, message) {
+            const error = document.createElement('div');
+            error.className = 'error-message2';
+            error.textContent = message;
+            input.insertAdjacentElement('afterend', error);
+        }
+
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+    });
+</script>
+
+
+
+

@@ -1,21 +1,36 @@
 .error-message {
     color: red;
-    background-color: #ffe6e6;
-    padding: 10px;
-    border: 1px solid red;
-    border-radius: 5px;
-    margin-bottom: 20px;
+    font-size: 20px;
+    position: absolute;
+    top: 40px;
     text-align: center;
+    border: 2px solid red;
+    border-radius: 10px;
+    padding: 10px 15px;
+    cursor: pointer;
 }
-
+.error-message2 {
+    color: red;
+    font-size: 20px;
+    position: absolute;
+    top: 0;
+    left: 140px;
+    text-align: center;
+    border: 2px solid red;
+    border-radius: 10px;
+    padding: 10px 15px;
+    cursor: pointer;
+}
 .success-message {
     color: green;
-    background-color: #e6ffe6;
-    padding: 10px;
-    border: 1px solid green;
-    border-radius: 5px;
-    margin-bottom: 20px;
+    font-size: 20px;
+    position: absolute;
+    top: 40px;
     text-align: center;
+    border: 2px solid green;
+    border-radius: 10px;
+    padding: 10px 15px;
+    cursor: pointer;
 }
 
 .register-first-container{
@@ -24,6 +39,9 @@
     min-height: calc(100vh - 80px);
     overflow: hidden;
     border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .register-first-container image{
     position: absolute;

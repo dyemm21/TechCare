@@ -1,10 +1,46 @@
-
 .login-first-container{
     position: relative;
     width: 100%;
     min-height: calc(100vh - 80px);
     overflow: hidden;
     border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.error-message-login {
+    color: red;
+    font-size: 20px;
+    position: absolute;
+    top: 150px;
+    text-align: center;
+    border: 2px solid red;
+    border-radius: 10px;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+.error-message-login2 {
+    color: red;
+    font-size: 20px;
+    position: absolute;
+    top: 0;
+    left: 140px;
+    text-align: center;
+    border: 2px solid red;
+    border-radius: 10px;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+.success-message-login {
+    color: green;
+    font-size: 20px;
+    position: absolute;
+    top: 150px;
+    text-align: center;
+    border: 2px solid green;
+    border-radius: 10px;
+    padding: 10px 15px;
+    cursor: pointer;
 }
 .login-first-container image{
     position: absolute;

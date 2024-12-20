@@ -1,5 +1,5 @@
 <div class="page-contact-first-back">
-    <img src="/public/background5.jpg" alt="background-image">
+    <img src="/public/map.jpg" alt="background-image">
     <div class="page-contact-first-container">
         <div class="google-map-container">
             <iframe
@@ -11,28 +11,8 @@
                     referrerpolicy="no-referrer-when-downgrade">
             </iframe>
         </div>
-        <div class="page-contact-first-grid">
-            <div class="page-contact-first-card">
-                <div class="page-contact-first-icon">
-                    <img src="/public/phone_call.svg" alt="Phone icon">
-                </div>
-                <h3 class="page-contact-first-title">Direct Call Us</h3>
-                <p class="page-contact-first-description">+00 12 345 6789<br/>+00 15 754 9876</p>
-            </div>
-            <div class="page-contact-first-card">
-                <div class="page-contact-first-icon">
-                    <img src="/public/location.svg" alt="Location icon">
-                </div>
-                <h3 class="page-contact-first-title">Location</h3>
-                <p class="page-contact-first-description">Radwańska 42<br/> 90-001, Lodz</p>
-            </div>
-            <div class="page-contact-first-card">
-                <div class="page-contact-first-icon">
-                    <img src="/public/email.svg" alt="Email icon">
-                </div>
-                <h3 class="page-contact-first-title">Email Us</h3>
-                <p class="page-contact-first-description">Support@techcare.com<br/>TechCare@gmail.com</p>
-            </div>
-        </div>
+            <?php
+             include './src/app/contact/firstComponent/contactIcons/contactIcons.php';
+             ?>
     </div>
 </div>

@@ -172,7 +172,25 @@
     gap: 20px;
     width: 100%;
 }
-.page-service-add-service-data-button
+.page-service-add-service-data-button1
+{
+    width: 100%;
+    background-color: #151515;
+    color: white;
+    border-radius: 10px;
+    border: none;
+    padding: 15px 20px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+.page-service-add-service-data-button1:hover
+{
+    background-color: black;
+}
+
+.page-service-add-service-data-button2
 {
     width: 100%;
     background-color: #3977ed;
@@ -185,7 +203,7 @@
     font-size: 16px;
     transition: background-color 0.3s ease;
 }
-.page-service-add-service-data-button:hover
+.page-service-add-service-data-button2:hover
 {
     background-color: #2158ca;
 }
@@ -223,6 +241,12 @@
     width: 100%;
     box-shadow: 2px 2px 2px rgba(0,0,0,0.1);
     font-size: 15px;
+}
+.page-service-add-service-buttons
+{
+    display: flex;
+    width: 100%;
+    gap: 20px;
 }
 
 @media (max-width: 1536px) {
