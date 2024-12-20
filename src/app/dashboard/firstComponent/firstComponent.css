@@ -921,9 +921,9 @@
 {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 5px;
     font-size: 16px;
-    padding: 0 20px 20px 20px;
+    padding: 0 20px 10px 20px;
 }
 .modal-admin-order-detail p{
     font-weight: 600;
@@ -937,7 +937,7 @@
     align-items: center;
     gap: 10px;
     width: 100%;
-    padding: 10px 0;
+    padding: 7px 0;
     border-bottom: solid 2px #cfcfcf;
 }
 .modal-admin-order-detail img{
